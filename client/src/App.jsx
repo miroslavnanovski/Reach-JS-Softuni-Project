@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
+import Gallery from "./pages/Gallery";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/upload" element={<Upload />} />
+              <Route path="/gallery" element={<Gallery/>} />
             </Routes>
           </div>
         </div>
