@@ -6,20 +6,39 @@ import Auth from "../middlewares/auth-middleware.js";
 const photoController = express.Router();
 
 // Upload a photo to Cloudinary
-photoController.post("/upload", Auth,  upload.single("image"), async (req, res) => {
+photoController.post("/upload", Auth, upload.single("image"), async (req, res) => {
   try {
-    const { caption } = req.body;
-    const imageUrl = req.file.path; // Cloudinary URL
-    const userId = req.user.userId;
+      
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
-    const newPhoto = new Photo({user: userId, imageUrl, caption });
+    const { caption, userId } = req.body;
+    const imageUrl = req.file.path; // Cloudinary URL
+
+    // Metadata available from Multer (size, format, etc.)
+    const metadata = {
+      size: req.file.size, // File size in bytes
+      format: req.file.mimetype, // image/jpeg, image/png, etc.
+      originalname: req.file.originalname, // Original file name
+    };
+
+    const newPhoto = new Photo({
+      user: userId,
+      imageUrl, // Use the correct Cloudinary URL
+      caption,
+      metadata, // Store metadata in the database
+    });
+
     await newPhoto.save();
 
     res.status(201).json(newPhoto);
   } catch (error) {
-    res.status(500).json({ message: "Upload failed", error });
+    console.error("Upload error:", error);
+    res.status(500).json({ message: "Upload failed", error: error.message });
   }
 });
+
 
 // Get all photos
 photoController.get("/", async (req, res) => {

@@ -2,6 +2,8 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
+import { v4 as uuidv4 } from "uuid";  // Importing UUID for generating unique IDs
+
 
 dotenv.config();
 
@@ -15,10 +17,14 @@ cloudinary.config({
 // Set up storage with Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "photo_gallery", // Folder in Cloudinary
+  params: (req, file) => ({
+    folder: "photo_gallery", // Cloudinary folder
     allowed_formats: ["jpg", "png", "jpeg"], // Allowed file types
-  },
+    public_id: `${file.originalname.split('.')[0]}_${uuidv4()}`, // Unique filename using original name + UUID
+    use_filename: true, // Keeps the original filename in Cloudinary
+    unique_filename: false, // Prevents Cloudinary from renaming the file
+    overwrite: false, // Does not overwrite files with the same name
+  }),
 });
 
 const upload = multer({ storage });

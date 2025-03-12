@@ -2,8 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
-import photoRoutes from "./routes/photoController.js";
-import authController from "./routes/authController.js";
+import photoRoutes from "./controllers/photoController.js";
+import authController from "./controllers/authController.js";
 
 
 
