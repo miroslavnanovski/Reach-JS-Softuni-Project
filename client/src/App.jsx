@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Upload from "./pages/Upload";
 import Gallery from "./pages/Gallery";
+import PhotoDetail from "./components/PhotoDetails";
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/upload" element={<Upload />} />
               <Route path="/gallery" element={<Gallery/>} />
+              <Route path="/gallery/:photoId" element={<PhotoDetail/>} />
             </Routes>
           </div>
         </div>

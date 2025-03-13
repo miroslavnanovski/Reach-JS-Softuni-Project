@@ -49,6 +49,20 @@ photoController.get("/", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch photos" });
   }
 });
+photoController.get("/:photoId", async (req, res) => {
+  try {
+    const photo = await Photo.findById(req.params.photoId); // More efficient
+    if (!photo) {
+      return res.status(404).json({ message: "Photo not found" });
+    }
+    res.json(photo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch photo" });
+  }
+});
+
+
 
 photoController.post("/:photoId/comment", Auth, async (req, res) => {
   try {

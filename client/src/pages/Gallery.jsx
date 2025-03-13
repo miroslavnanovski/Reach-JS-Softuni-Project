@@ -3,7 +3,7 @@ import GalleryItem from "../components/GalleryItem";
 
 export default function Gallery() {
     const [photos, setPhotos] = useState([]);
-
+ 
 
     useEffect(() => {
 
@@ -33,7 +33,8 @@ export default function Gallery() {
     
     return (
         <>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          
                 {photos.length === 0 ? "Loading..." : photos.map((photo) => (
                     <GalleryItem 
                         key={photo._id}
@@ -42,7 +43,12 @@ export default function Gallery() {
                 ))}
             </div>
 
-
         </>
     )
 }
+
+
+
+  
+    
+    

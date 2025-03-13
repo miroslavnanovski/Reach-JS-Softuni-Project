@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  
+   
     return (
       <nav className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold text-blue-600">PhotoShare</Link>
