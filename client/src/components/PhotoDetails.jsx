@@ -1,26 +1,16 @@
 // PhotoDetail.js
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import CommentsSection from "./comments-section/CommentsSection";
+import useFetchSingle from "../utils/useFetchSinglePhoto";
 
 function PhotoDetail() {
   const { photoId } = useParams();
 
   // Fetch photo details using the id (or pass the photo info as props)
-  const [photo, setPhoto] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const {photo, isLoading} = useFetchSingle(photoId);
 
-  useEffect(() => {
-    const getSinglePhoto = async () => {
-      const res = await fetch(`http://localhost:3000/api/photos/${photoId}`, {
-        method: "GET",
-      });
-
-      const loadedPhoto = await res.json();
-      setPhoto(loadedPhoto);
-      setIsLoading(false);
-    };
-    getSinglePhoto();
-  }, []);
+  
 
   return (
     <>
@@ -49,7 +39,7 @@ function PhotoDetail() {
           {/* User Info */}
           <div className="flex items-center mb-4">
             <img
-              src=""
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6tWkfCJfejkeaq78A0p6L5CZWFFVwxyz0DA&s"
               alt="User avatar"
               className="w-12 h-12 rounded-full mr-3 object-cover"
             />
@@ -71,12 +61,11 @@ function PhotoDetail() {
       </div>
 
       {/* Bottom Section: Comments */}
-      <div className="border-t border-gray-200 p-6">
-        <h2 className="text-lg font-semibold mb-4">Comments ({photo.comments.length})</h2>
+        <CommentsSection photo={photo} />
         {/* Comment listing here */}
       </div>
     </div>
-  </div>
+
 )}
 
     </>

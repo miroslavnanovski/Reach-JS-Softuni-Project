@@ -5,7 +5,7 @@ export default function decodeToken() {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        return decoded.userId; // assuming the token contains a userId
+        return decoded; 
       } catch (error) {
         console.error('Token decode error:', error);
         return null;

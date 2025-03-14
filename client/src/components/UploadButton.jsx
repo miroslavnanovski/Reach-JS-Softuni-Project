@@ -12,7 +12,7 @@ export default function UploadButton() {
     const [showModal, setShowModal] = useState(false);
     const [progress, setProgress] = useState(0); 
 
-    const userId = decodeToken();
+    const {userId} = decodeToken();
     const navigate = useNavigate();
   
 
