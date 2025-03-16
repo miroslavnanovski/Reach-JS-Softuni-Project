@@ -8,7 +8,7 @@ export default function CommentsSection({photo}) {
   const [comments,setComments] = useState([])
   const [newComment,setNewComment] = useState('')
   const { photoId } = useParams();
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('Authorization');
 
   useEffect(() => {
   if (photo?.comments?.length > 0) {

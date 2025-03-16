@@ -70,7 +70,7 @@ export default function UploadButton() {
         const response = await fetch('http://localhost:3000/api/photos/upload', {
           method: 'POST',
           headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`, // Send token in the Authorization header
+        'Authorization': `Bearer ${localStorage.getItem('Authorization')}`, // Send token in the Authorization header
       },
           body: formData,
         });

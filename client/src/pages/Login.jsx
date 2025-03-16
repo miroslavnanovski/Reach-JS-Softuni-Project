@@ -20,7 +20,7 @@ export default function Login() {
     const data = await res.json(); // Get the response JSON
 
     if (res.ok) {
-        localStorage.setItem("authToken", data.token); // Store token
+        localStorage.setItem("Authorization", data.token); // Store token
       navigate("/");
     } else {
       alert("Invalid credentials!");

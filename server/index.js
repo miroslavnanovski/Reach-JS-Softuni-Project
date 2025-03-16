@@ -4,6 +4,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import photoRoutes from "./controllers/photoController.js";
 import authController from "./controllers/authController.js";
+import userController from "./controllers/userController.js";
 
 
 
@@ -31,6 +32,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/photos", photoRoutes);
 app.use("/api/auth", authController);
+app.use("/api/user", userController)
 
 // Simple test route
 app.get("/", (req, res) => {
