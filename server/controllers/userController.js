@@ -30,6 +30,20 @@ userController.post("/update-email", Auth, async (req, res) => {
   }
 });
 
+userController.get('/:userId', Auth, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User fetched successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
 userController.post("/update-password", Auth, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.userId;
@@ -51,7 +65,7 @@ userController.post("/update-password", Auth, async (req, res) => {
       user.password = await bcrypt.hash(newPassword, salt);
       await user.save();
   
-      res.json({ message: "Password updated successfully" });
+      res.json({ message: "Password updated successfully"});
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }

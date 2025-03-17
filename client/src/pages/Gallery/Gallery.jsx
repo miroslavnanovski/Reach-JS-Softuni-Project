@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import GalleryItem from "../components/GalleryItem";
+import GalleryItem from "./GalleryItem";
 
 export default function Gallery() {
     const [photos, setPhotos] = useState([]);
@@ -35,7 +35,7 @@ export default function Gallery() {
         <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           
-                {photos.length === 0 ? "Loading..." : photos.map((photo) => (
+                {photos.length === 0 ? "There are not photos yet.Upload some to visualize them here!" : photos.map((photo) => (
                     <GalleryItem 
                         key={photo._id}
                         {...photo} 

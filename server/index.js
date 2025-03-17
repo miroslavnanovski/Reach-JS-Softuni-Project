@@ -6,41 +6,41 @@ import photoRoutes from "./controllers/photoController.js";
 import authController from "./controllers/authController.js";
 import userController from "./controllers/userController.js";
 
+// Load environment variables
+dotenv.config();
 
+// Use Mongoose for MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI;
 
-const connectDB = async () => {
+async function connectDB() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/photo_gallery', {
+    await mongoose.connect(MONGO_URI, {
+      dbName: "Photo-Gallery",
     });
-    console.log("MongoDB Connected...");
+    console.log("✅ Connected to MongoDB Atlas");
   } catch (error) {
-    console.error("MongoDB Connection Failed:", error);
+    console.error("❌ MongoDB Connection Error:", error);
     process.exit(1);
   }
-};
+}
 
 connectDB();
 
-
-
-
-dotenv.config();
-
 const app = express();
-
 app.use(express.json());
 app.use(cors());
+
+// API Routes
 app.use("/api/photos", photoRoutes);
 app.use("/api/auth", authController);
-app.use("/api/user", userController)
+app.use("/api/user", userController);
 
 // Simple test route
 app.get("/", (req, res) => {
-    res.send("Photo Gallery Backend is Running...");
+  res.send("Photo Gallery Backend is Running...");
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
