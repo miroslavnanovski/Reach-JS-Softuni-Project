@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import DropdownMenu from "./DropdownMenu";
 import AuthModal from "./authModal";
+import { UserContext } from "../../contexts/userContext";
 
 export default function Navbar() {
     const [current,setCurrent] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { user } = useContext(UserContext);
 
+   
    
     return (
     <nav className="bg-gray-800">
@@ -31,16 +34,32 @@ export default function Navbar() {
       >
         Gallery
       </Link>
-  
-      <Link
+          
+      {user &&
+      <>
+        <Link
         to="/upload"
         className={`rounded-md px-3 py-2 text-sm font-medium ${
           current === "upload" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
         }`}
-        onClick={() => setCurrent("login")}
+        onClick={() => setCurrent("upload")}
       >
         Upload
       </Link>
+
+      <Link
+        to="/user-gallery"
+        className={`rounded-md px-3 py-2 text-sm font-medium ${
+          current === "user-gallery" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        }`}
+        onClick={() => setCurrent("user-gallery")}
+      >
+        User Gallery
+      </Link>
+      </>
+      
+      }
+     
             <a
               href="#"
               className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -74,13 +93,18 @@ export default function Navbar() {
           </svg>
         </button> */}
         {/* Profile dropdown */}
-        <button
+        {!user && 
+        
+          <button
               onClick={() => setIsModalOpen(true)}
               href="#"
               className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >
               Sign up
             </button>
+        
+        }
+        
             <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
         <DropdownMenu/>
       </div>

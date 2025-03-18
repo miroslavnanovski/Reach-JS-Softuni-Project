@@ -20,7 +20,9 @@ export const useRegister = () => {
     const register = async (username, email, password) => {
         try {
             const result = await axios.post(`${URL}/register`, { username, email, password });
-          
+            
+            return result.data;
+            
 
         } catch (error) {
             console.error("Registration Error:", error.response?.data || error.message);

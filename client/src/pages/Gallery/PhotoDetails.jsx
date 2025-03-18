@@ -1,22 +1,23 @@
 // PhotoDetail.js
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CommentsSection from "../../components/comments-section/CommentsSection";
 import useFetchSingle from "../../utils/useFetchSinglePhoto";
 import dateFormat from "../../utils/dateFormat";
-import useFetchUser from "../../utils/useFetchUser";
+import useFetchUserById from "../../hooks/useFetchUserById";
+
 
 function PhotoDetail() {
   const { photoId } = useParams();
-
-  const user = useFetchUser()
-  const createdDate = dateFormat(user.createdAt);
-  
-
-  // Fetch photo details using the id (or pass the photo info as props)
   const {photo, isLoading} = useFetchSingle(photoId);
-
+  const {user} = useFetchUserById(photo?.user);
   
+  if (isLoading) return <p>Loading photo...</p>;
+  if (!photo) return <p>Photo not found.</p>;
+  
+  const createdDate = dateFormat(photo.createdAt);
+  
+
 
   return (
     <>
@@ -50,8 +51,8 @@ function PhotoDetail() {
               className="w-12 h-12 rounded-full mr-3 object-cover"
             />
             <div>
-              <p className="font-semibold text-gray-700">{user.username}</p>
-              <p className="text-sm text-gray-500">{createdDate}</p>
+              <p className="font-semibold text-gray-700">{user?.username}</p>
+              <p className="text-sm text-gray-500">{photo.createdAt}</p>
             </div>
           </div>
           {/* Stats */}

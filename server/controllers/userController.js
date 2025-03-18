@@ -31,7 +31,7 @@ userController.post("/update-email", Auth, async (req, res) => {
   }
 });
 
-userController.get('/:userId', Auth, async (req, res) => {
+userController.get('/:userId', async (req, res) => {
   const { userId } = req.params;
 
   try {

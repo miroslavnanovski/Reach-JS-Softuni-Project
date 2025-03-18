@@ -30,25 +30,33 @@ const AuthModal = ({ isOpen, onClose }) => {
 
     try {
       let data;
+      
       if (isSignUp) {
         const response = await register(formData.username, formData.email, formData.password);
+       console.log(response);
+       
 
+        if (!response || !response.token || !response.user) {
+          throw new Error("Invalid response from register");
+        }
         data = response;
       } else {
         const response = await login(formData.email, formData.password);
-
+        if (!response || !response.token || !response.user) {
+          throw new Error("Invalid response from login");
+        }
+        console.log(response);
         data = response;
       }
-
-      if (data && data.token && data.user) {
-
-        loginUser(data); // Store user in context
-        onClose(); // Close modal on successful login
-      }
+    
+      // If we have valid data, store user and close modal
+      loginUser(data);
+      onClose();
     } catch (error) {
+      console.error("Authentication Error:", error);
       setError(error.message || "Something went wrong");
     }
-  };
+  }
 
 
 
