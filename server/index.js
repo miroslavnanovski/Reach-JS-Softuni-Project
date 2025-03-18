@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import photoRoutes from "./controllers/photoController.js";
 import authController from "./controllers/authController.js";
 import userController from "./controllers/userController.js";
+import logCRUDOperations from "./middlewares/log-middleware.js";
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,7 @@ connectDB();
 
 const app = express();
 app.use(express.json());
+app.use(logCRUDOperations);
 app.use(cors());
 
 // API Routes

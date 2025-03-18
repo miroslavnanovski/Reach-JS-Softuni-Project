@@ -17,14 +17,22 @@ cloudinary.config({
 // Set up storage with Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: (req, file) => ({
-    folder: "photo_gallery", // Cloudinary folder
-    allowed_formats: ["jpg", "png", "jpeg"], // Allowed file types
-    public_id: `${file.originalname.split('.')[0]}_${uuidv4()}`, // Unique filename using original name + UUID
-    use_filename: true, // Keeps the original filename in Cloudinary
-    unique_filename: false, // Prevents Cloudinary from renaming the file
-    overwrite: false, // Does not overwrite files with the same name
-  }),
+  params: (req, file) => {
+    // Determine the folder based on the route or request type
+    let folder = "photo_gallery"; // Default folder
+    if (req.path.includes("profile-picture")) {
+      folder = "profile_pictures"; // Separate folder for profile pictures
+    }
+
+    return {
+      folder,
+      allowed_formats: ["jpg", "png", "jpeg"],
+      public_id: `${file.originalname.split('.')[0]}_${uuidv4()}`,
+      use_filename: true,
+      unique_filename: false,
+      overwrite: false,
+    };
+  },
 });
 
 const upload = multer({ storage });

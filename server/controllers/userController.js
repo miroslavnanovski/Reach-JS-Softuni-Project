@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/User.js"; 
 import bcrypt from "bcryptjs";
 import Auth from "../middlewares/auth-middleware.js";
+import { upload } from "../middlewares/cloudinary-middleware.js";
 
 const userController = express.Router();
 
@@ -68,6 +69,19 @@ userController.post("/update-password", Auth, async (req, res) => {
       res.json({ message: "Password updated successfully"});
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
+    }
+  });
+
+  userController.put("/profile-picture", Auth, upload.single("image"), async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const imageUrl = req.file.path;
+  
+      const updatedUser = await User.findByIdAndUpdate(userId, { profilePicture: imageUrl }, { new: true });
+  
+      res.status(200).json({ message: "Profile picture updated", profilePicture: updatedUser.profilePicture });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating profile picture", error });
     }
   });
   
