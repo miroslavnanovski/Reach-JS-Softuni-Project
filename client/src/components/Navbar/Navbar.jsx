@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import DropdownMenu from "./DropdownMenu";
+import AuthModal from "./authModal";
 
 export default function Navbar() {
     const [current,setCurrent] = useState("")
-    const [isOpen, setIsOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
    
     return (
-      <nav className="bg-gray-800">
-  <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <nav className="bg-gray-800">
+    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div className="relative flex h-16 items-center justify-between">
       <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
       </div>
@@ -30,28 +31,7 @@ export default function Navbar() {
       >
         Gallery
       </Link>
-      <Link
-        to="/login"
-        className={`rounded-md px-3 py-2 text-sm font-medium ${
-          current === "login" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
-        }`}
-        onClick={() => setCurrent("login")}
-      >
-        Login
-      </Link>
-
-      
-
-      <Link
-        to="/register"
-        className={`rounded-md px-3 py-2 text-sm font-medium ${
-          current === "register" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
-        }`}
-        onClick={() => setCurrent("register")}
-      >
-        Register
-      </Link>
-      
+  
       <Link
         to="/upload"
         className={`rounded-md px-3 py-2 text-sm font-medium ${
@@ -71,7 +51,7 @@ export default function Navbar() {
         </div>
       </div>
       <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <button
+        {/* <button   NOTIFICATION ICON - TODO:
           type="button"
           className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
         >
@@ -92,9 +72,16 @@ export default function Navbar() {
               d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
             />
           </svg>
-        </button>
+        </button> */}
         {/* Profile dropdown */}
-        
+        <button
+              onClick={() => setIsModalOpen(true)}
+              href="#"
+              className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              Sign up
+            </button>
+            <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
         <DropdownMenu/>
       </div>
     </div>

@@ -11,7 +11,7 @@ export default function UserSettings() {
 
   const token = localStorage.getItem('Authorization');
 
-  const user = useFetchUser();
+  const user = useFetchUser(); 
 
   
   useEffect(() => {

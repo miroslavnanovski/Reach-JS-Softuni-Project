@@ -2,35 +2,40 @@ import { useEffect, useState } from "react";
 import decodeToken from "./decodeToken";
 import axios from "axios";
 
-export default function useFetchUser(){
-    const token = localStorage.getItem('Authorization');
-    const {userId} = decodeToken();
+export default function useFetchUser() {
+  const [user, setUser] = useState(null);  // Set initial user state to null
+  const token = localStorage.getItem('Authorization');
 
-    
-    const [user,setUser] = useState({})
+  useEffect(() => {
+    // Don't proceed if there's no token in localStorage
+    if (!token) return;
 
-    useEffect(() => {
-        if (!userId) return;
+    const { userId } = decodeToken(token); // Make sure decodeToken receives a token
 
-        const fetchUser = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:3000/api/user/${userId}`,
-                    {
-                        headers: { "Authorization": `Bearer ${token}` }
-                    }
-                );
-                setUser(response.data.user); // Update state with actual user data
-            } catch (error) {
-                console.error("Error fetching user:", error);
-            }
-        };
+    // If no userId, exit early
+    if (!userId) return;
 
-        fetchUser();
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/user/${userId}`,
+          {
+            headers: { "Authorization": `Bearer ${token}` }
+          }
+        );
+        // Ensure the response contains user data
+        if (response.data && response.data.user) {
+          setUser(response.data.user);
+        } else {
+          console.error("No user data found in response");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
 
-    },[userId, token])
-  
+    fetchUser();
+  }, [token]);  // Add token to dependency array
 
-   return user;
-    
+  return user;
 }

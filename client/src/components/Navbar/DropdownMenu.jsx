@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext, useUser } from "../../contexts/userContext";
 
-
-export default function DropdownMenu () {
+export default function DropdownMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null); // Reference for the dropdown menu
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const { logoutUser } = useUser();
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate("/");
+  };
 
   // Function to handle clicks outside the menu
   useEffect(() => {
@@ -25,31 +34,34 @@ export default function DropdownMenu () {
     };
   }, [isOpen]);
 
+  // Only render the dropdown if the user is available
+  if (!user) {
+    return null; // Or render something else like a login button
+  }
 
   return (
     <div className="relative" ref={menuRef}>
       {/* Toggle Button */}
       <div className="relative ml-3">
-  <div>
-    <button
-    onClick={() => setIsOpen(!isOpen)}
-      type="button"
-      className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
-      id="user-menu-button"
-      aria-expanded={isOpen}
-      aria-haspopup="true"
-    >
-      <span className="absolute -inset-1.5" />
-      <span className="sr-only">Open user menu</span>
-      <img
-        className="size-8 rounded-full"
-        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-        alt=""
-      />
-    </button>
-  </div>
-</div>
-
+        <div>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            type="button"
+            className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+            id="user-menu-button"
+            aria-expanded={isOpen}
+            aria-haspopup="true"
+          >
+            <span className="absolute -inset-1.5" />
+            <span className="sr-only">Open user menu</span>
+            <img
+              className="size-8 rounded-full"
+              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              alt=""
+            />
+          </button>
+        </div>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -61,33 +73,34 @@ export default function DropdownMenu () {
           aria-labelledby="user-menu-button"
           tabIndex={-1}
         >
-          <a
-            href="#"
+          <Link
+            onClick={() => setIsOpen(!isOpen)}
+            to={`/${user._id}/profile`}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
             tabIndex={-1}
           >
             Your Profile
-          </a>
+          </Link>
           <Link
             onClick={() => setIsOpen(!isOpen)}
-            to="/:userId/settings"
-            href="#"
+            to={`/${user._id}/settings`}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
             tabIndex={-1}
-          >Settings
+          >
+            Settings
           </Link>
-          <a
-            href="#"
+          <button
+            onClick={handleLogout}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             role="menuitem"
             tabIndex={-1}
           >
             Sign out
-          </a>
+          </button>
         </div>
       )}
     </div>
   );
-};
+}
