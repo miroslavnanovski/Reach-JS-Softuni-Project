@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar/Navbar";
 import UserSettings from "./pages/UserSettings/UserSettings";
 import ProfileCard from "./pages/Profile/ProfileCard";
 import { UserProvider } from "./contexts/userContext";
+import UserGallery from "./pages/Gallery/UserGallery";
 
 
 
@@ -26,6 +27,7 @@ function App() {
               <Route path="/upload" element={<Upload />} />
               <Route path="/gallery" element={<Gallery/>} />
               <Route path="/gallery/:photoId" element={<PhotoDetail/>} />
+              <Route path="/user-gallery" element={<UserGallery/>} />
               <Route path="/:userId/settings" element={<UserSettings/>} />
               <Route path="/:userId/profile" element={<ProfileCard/>} />
             </Routes>

@@ -3,14 +3,19 @@ import GalleryItem from "./GalleryItem";
 import Masonry from "react-masonry-css";
 import "./Gallery.css"
 
-export default function Gallery() {
+export default function Gallery({ userId,onPhotosCountChange }) {
     const [photos, setPhotos] = useState([]);
  
 
     useEffect(() => {
 
         const getPhotos = async () => {
-            const res = await fetch("http://localhost:3000/api/photos", {
+
+            const url = userId
+                ? `http://localhost:3000/api/photos?userId=${userId}`
+                : "http://localhost:3000/api/photos";
+
+            const res = await fetch(url , {
                 method: "GET"
             });
 
@@ -18,12 +23,14 @@ export default function Gallery() {
                
 
             setPhotos(loadedPhotos);
+            onPhotosCountChange(loadedPhotos.length);
+
 
         }
         getPhotos();
     
         
-    }, [])
+    }, [userId, onPhotosCountChange])
 
     const breakpointColumns = {
         default: 4,
