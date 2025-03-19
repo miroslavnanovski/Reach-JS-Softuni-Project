@@ -43,12 +43,24 @@ photoController.post("/upload", Auth, upload.single("image"), async (req, res) =
 // Get all photos
 photoController.get("/", async (req, res) => {
   try {
-    const photos = await Photo.find().populate();
+    const { userId } = req.query;  // Get userId from query parameters
+    let photos;
+
+    if (userId) {
+      // If userId is provided, filter photos by the user's ObjectId
+      photos = await Photo.find({ user: userId }).populate();
+    } else {
+      // If no userId is provided, fetch all photos
+      photos = await Photo.find().populate();
+    }
+
     res.json(photos);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch photos" });
   }
 });
+
+
 photoController.get("/:photoId", async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.photoId); // More efficient
