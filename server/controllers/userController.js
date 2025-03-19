@@ -74,16 +74,27 @@ userController.post("/update-password", Auth, async (req, res) => {
 
   userController.put("/profile-picture", Auth, upload.single("image"), async (req, res) => {
     try {
-      const userId = req.user.id;
-      const imageUrl = req.file.path;
-  
-      const updatedUser = await User.findByIdAndUpdate(userId, { profilePicture: imageUrl }, { new: true });
-  
-      res.status(200).json({ message: "Profile picture updated", profilePicture: updatedUser.profilePicture });
+        console.log("User ID from Middleware:", req.user); // Debugging
+        if (!req.user || !req.user.id) {
+            return res.status(400).json({ message: "User ID missing from request" });
+        }
+
+        const userId = req.user.id; // ✅ This should now work
+        const imageUrl = req.file.path;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { profilePicture: imageUrl },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Profile picture updated", profilePicture: updatedUser.profilePicture });
     } catch (error) {
-      res.status(500).json({ message: "Error updating profile picture", error });
+        console.error("Error updating profile picture:", error);
+        res.status(500).json({ message: "Error updating profile picture", error });
     }
-  });
+});
+
   
 
 export default userController;

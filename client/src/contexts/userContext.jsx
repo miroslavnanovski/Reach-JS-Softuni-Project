@@ -1,17 +1,15 @@
-import { createContext, useState, useEffect } from "react";
-import { useContext } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import useFetchUser from "../utils/useFetchUser";
 
-export const UserContext = createContext(null);
+const UserContext = createContext(null);
 
 export const useUser = () => useContext(UserContext);
 
-export const UserProvider = ({ children }) => {
-  // Call useFetchUser unconditionally at the top of the component
-  const fetchedUser = useFetchUser();
-  const [user, setUser] = useState(fetchedUser);  // Set the user from the hook initially
+const UserProvider = ({ children }) => {
+  const [token, setToken] = useState(() => localStorage.getItem("Authorization") || null);
+  const fetchedUser = useFetchUser(token);
+  const [user, setUser] = useState(null);
 
-  // This useEffect ensures that if fetchedUser changes, we update the user state
   useEffect(() => {
     if (fetchedUser) {
       setUser(fetchedUser);
@@ -19,19 +17,22 @@ export const UserProvider = ({ children }) => {
   }, [fetchedUser]);
 
   const loginUser = (userData) => {
-    console.log("Logging in user:", userData);
-    setUser(userData);
+    setToken(userData.token);
     localStorage.setItem("Authorization", userData.token);
   };
 
   const logoutUser = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("Authorization");
   };
 
   return (
-    <UserContext.Provider value={{ user, loginUser, logoutUser }}>
+    <UserContext.Provider value={{ user, token, loginUser, logoutUser }}>
       {children}
     </UserContext.Provider>
   );
 };
+
+// ✅ Export only one default provider
+export { UserContext, UserProvider };

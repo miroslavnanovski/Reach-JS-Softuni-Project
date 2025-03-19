@@ -33,7 +33,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       
       if (isSignUp) {
         const response = await register(formData.username, formData.email, formData.password);
-       console.log(response);
+      
        
 
         if (!response || !response.token || !response.user) {
@@ -45,7 +45,7 @@ const AuthModal = ({ isOpen, onClose }) => {
         if (!response || !response.token || !response.user) {
           throw new Error("Invalid response from login");
         }
-        console.log(response);
+      
         data = response;
       }
     
