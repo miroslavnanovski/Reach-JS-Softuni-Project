@@ -75,11 +75,11 @@ userController.post("/update-password", Auth, async (req, res) => {
   userController.put("/profile-picture", Auth, upload.single("image"), async (req, res) => {
     try {
         console.log("User ID from Middleware:", req.user); // Debugging
-        if (!req.user || !req.user.id) {
+        if (!req.user || !req.user.userId) {
             return res.status(400).json({ message: "User ID missing from request" });
         }
 
-        const userId = req.user.id; // ✅ This should now work
+        const userId = req.user.userId; // ✅ This should now work
         const imageUrl = req.file.path;
 
         const updatedUser = await User.findByIdAndUpdate(

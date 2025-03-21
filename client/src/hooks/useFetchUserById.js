@@ -5,7 +5,11 @@ export default function useFetchUserById(userId) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    
     if (!userId) return; // Prevent API call if userId is null/undefined
+
+    
+    
 
     const fetchUser = async () => {
       try {

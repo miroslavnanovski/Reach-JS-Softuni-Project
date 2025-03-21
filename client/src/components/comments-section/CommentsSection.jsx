@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
 import axios from 'axios';
 import SingleComment from "./SingleComments";
+import { useUser } from "../../contexts/userContext";
 
 
 export default function CommentsSection({photo}) {
@@ -10,11 +11,20 @@ export default function CommentsSection({photo}) {
   const { photoId } = useParams();
   const token = localStorage.getItem('Authorization');
 
+  const { user } = useUser();
+ 
+  
+
+  
+
   useEffect(() => {
   if (photo?.comments?.length > 0) {
     setComments(photo.comments);
   }
 }, [photo]); // Only re-run when the photo prop changes
+
+const userProfilePicture = user?.profilePicture || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6tWkfCJfejkeaq78A0p6L5CZWFFVwxyz0DA&s';
+
 
   
 
@@ -31,7 +41,6 @@ export default function CommentsSection({photo}) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-  
       // Update comments state with the updated array from API response
       if (response.data.comments) {
         setComments(response.data.comments); // Replace the comments state with the new updated list
@@ -39,10 +48,9 @@ export default function CommentsSection({photo}) {
   
       setNewComment(""); // Clear the input field after successful submission
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.error("Error creating comment:", error);
     }
   };
-
    
 
 
@@ -58,8 +66,8 @@ export default function CommentsSection({photo}) {
             <div className="w-full rounded-3xl justify-start items-start gap-3.5 inline-flex">
               <img
                 className="w-10 h-10 object-cover"
-                src="https://pagedone.io/asset/uploads/1710225753.png"
-                alt="John smith image"
+                src={userProfilePicture}
+                alt={user?.username}
               />
               <textarea
                 name=""

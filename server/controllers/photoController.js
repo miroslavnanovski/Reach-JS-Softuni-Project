@@ -79,20 +79,28 @@ photoController.get("/:photoId", async (req, res) => {
 photoController.post("/:photoId/comment", Auth, async (req, res) => {
   try {
     const { text } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user.userId; // Assuming the userId is in the token or session
+    console.log(userId);
+    
     const photo = await Photo.findById(req.params.photoId);
 
     if (!photo) return res.status(404).json({ message: "Photo not found" });
 
+    // Create the comment object with the userId, text, and createdAt
     const comment = { user: userId, text, createdAt: new Date() };
+    
+    // Push the comment into the photo's comments array
     photo.comments.push(comment);
     await photo.save();
 
-    res.status(201).json(photo);
+    // Send back the updated comments array with the comment's userId included
+    res.status(201).json({ comments: photo.comments });
   } catch (error) {
     res.status(500).json({ message: "Error adding comment", error });
   }
 });
+
+
 
 photoController.post("/:photoId/like", Auth, async (req, res) => {
   try {

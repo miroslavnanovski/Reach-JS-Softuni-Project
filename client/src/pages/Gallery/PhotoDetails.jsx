@@ -10,13 +10,16 @@ import useFetchUserById from "../../hooks/useFetchUserById";
 function PhotoDetail() {
   const { photoId } = useParams();
   const {photo, isLoading} = useFetchSingle(photoId);
+
   const {user} = useFetchUserById(photo?.user);
+
   
   if (isLoading) return <p>Loading photo...</p>;
   if (!photo) return <p>Photo not found.</p>;
   
   const createdDate = dateFormat(photo.createdAt);
-  
+
+  const userProfilePicture = user?.profilePicture || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6tWkfCJfejkeaq78A0p6L5CZWFFVwxyz0DA&s';
 
 
   return (
@@ -46,7 +49,7 @@ function PhotoDetail() {
           {/* User Info */}
           <div className="flex items-center mb-4">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6tWkfCJfejkeaq78A0p6L5CZWFFVwxyz0DA&s"
+              src={userProfilePicture}
               alt="User avatar"
               className="w-12 h-12 rounded-full mr-3 object-cover"
             />
