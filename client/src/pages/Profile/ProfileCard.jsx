@@ -4,6 +4,7 @@ import { UserContext, useUser } from "../../contexts/userContext";
 export default function ProfileCard() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null); // Default profile image
+  const [isUploaded,setIsUploaded] = useState(false);
 
   const { user, token } = useUser();
 
@@ -16,6 +17,7 @@ export default function ProfileCard() {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setIsUploaded(false)
 
       // Create a URL for preview
       const objectUrl = URL.createObjectURL(selectedFile);
@@ -52,6 +54,7 @@ export default function ProfileCard() {
       if (response.ok) {
         alert("Profile picture updated successfully!");
         setPreview(data.profilePicture); // Update UI with new image URL
+        setIsUploaded(true);
       } else {
         alert(data.message);
       }
@@ -90,7 +93,7 @@ export default function ProfileCard() {
               Select Profile Picture
             </label>
 
-            {file && (
+            {(file && !isUploaded) &&  (
               <button
                 onClick={handleUpload}
                 className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-900 transition-colors duration-300"

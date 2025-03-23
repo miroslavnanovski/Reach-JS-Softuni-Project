@@ -10,6 +10,7 @@ const UserProvider = ({ children }) => {
   const fetchedUser = useFetchUser(token);
   const [user, setUser] = useState(null);
 
+
   useEffect(() => {
     if (fetchedUser) {
       setUser(fetchedUser);
@@ -26,6 +27,8 @@ const UserProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("Authorization");
   };
+
+
 
   return (
     <UserContext.Provider value={{ user, token, loginUser, logoutUser }}>

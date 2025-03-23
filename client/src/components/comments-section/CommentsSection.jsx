@@ -12,6 +12,8 @@ export default function CommentsSection({photo}) {
   const token = localStorage.getItem('Authorization');
 
   const { user } = useUser();
+  
+  
  
   
 

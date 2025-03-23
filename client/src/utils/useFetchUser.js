@@ -3,14 +3,15 @@ import decodeToken from "./decodeToken";
 import axios from "axios";
 
 export default function useFetchUser() {
-  const [user, setUser] = useState(null);  // Set initial user state to null
+  const [user, setUser] = useState(null);
   const token = localStorage.getItem('Authorization');
 
   useEffect(() => {
     // Don't proceed if there's no token in localStorage
     if (!token) return;
 
-    const { userId } = decodeToken(token); // Make sure decodeToken receives a token
+    const { userId } = decodeToken(token);
+ 
 
     // If no userId, exit early
     if (!userId) return;
@@ -23,7 +24,7 @@ export default function useFetchUser() {
             headers: { "Authorization": `Bearer ${token}` }
           }
         );
-        // Ensure the response contains user data
+        // Ensure the response contains user data.
         if (response.data && response.data.user) {
           setUser(response.data.user);
         } else {

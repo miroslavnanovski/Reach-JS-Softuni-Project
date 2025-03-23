@@ -146,6 +146,27 @@ photoController.post("/:photoId/favorite", Auth, async (req, res) => {
   }
 });
 
+photoController.delete("/:photoId/delete", Auth, async (req, res) => {
+  try {
+    const photo = await Photo.findById(req.params.photoId);
+    if (!photo) {
+      return res.status(404).json({ message: "Photo not found" });
+    }
+
+    // Optional: Ensure the user owns the photo before deleting
+    
+    if (photo.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized to delete this photo" });
+    }
+
+    await photo.deleteOne(); // Ensure deletion completes
+
+    return res.json({ message: "Photo deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting photo!", error });
+  }
+})
+
 
 
 

@@ -21,14 +21,28 @@ export default function UserGallery() {
 
     return (
         <>
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-center text-3xl font-semibold w-full">Your Images</h1>
-            </div>
-            <div className="flex justify-between">
-                <div className="text-left text-lg">{user.username}</div>
-                <div className="text-right text-lg">Image Count: {photosCount}</div>
-            </div>
-            <Gallery userId={userId} onPhotosCountChange={updatePhotosCount} /> 
-        </>
+    <div className="flex justify-center mb-4">
+        <h1 className="text-3xl font-semibold text-center">Your Downloads</h1>
+    </div>
+    
+   
+
+    <div className="flex items-center justify-between px-6">
+        <div className="flex items-center space-x-3">
+            <img
+                src={user.profilePicture}
+                alt="User Avatar"
+                className="w-12 h-12 rounded-full object-cover"
+            />
+            <span className="text-lg font-medium">{user.username}</span>
+        </div>
+        <div className="text-lg text-gray-600">{photosCount} results</div>
+    </div>
+    <hr className="border-gray-300 my-4" />
+
+    <Gallery userId={userId} onPhotosCountChange={updatePhotosCount} />
+</>
+
+    
     );
 }

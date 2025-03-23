@@ -1,14 +1,15 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext, useUser } from "../../contexts/userContext";
 
 export default function DropdownMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null); // Reference for the dropdown menu
-  const { user } = useContext(UserContext);
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const { logoutUser } = useUser();
+  
 
   const handleLogout = () => {
     logoutUser();
@@ -56,7 +57,7 @@ export default function DropdownMenu() {
             <span className="sr-only">Open user menu</span>
             <img
               className="size-8 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              src={user.profilePicture}
               alt=""
             />
           </button>

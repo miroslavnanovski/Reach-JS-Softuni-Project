@@ -1,13 +1,13 @@
-import { useContext, useState } from "react";
+import {  useState } from "react";
 import { Link } from "react-router-dom";
 import DropdownMenu from "./DropdownMenu";
 import AuthModal from "./authModal";
-import { UserContext } from "../../contexts/userContext";
+import {  useUser } from "../../contexts/userContext";
 
 export default function Navbar() {
     const [current,setCurrent] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { user } = useContext(UserContext);
+    const { user } = useUser();
 
    
    
