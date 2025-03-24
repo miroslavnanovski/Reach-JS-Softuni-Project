@@ -1,11 +1,12 @@
 // PhotoDetail.js
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CommentsSection from "../../components/comments-section/CommentsSection";
 import useFetchSingle from "../../utils/useFetchSinglePhoto";
 import dateFormat from "../../utils/dateFormat";
 import useFetchUserById from "../../hooks/useFetchUserById";
 import { useUser } from "../../contexts/userContext";
+import axios from "axios";
 
 
 function PhotoDetail() {
@@ -14,7 +15,9 @@ function PhotoDetail() {
   const { photo, isLoading } = useFetchSingle(photoId);
   const { user } = useFetchUserById(photo?.user);
 
-  const { user: loggedInUser } = useUser();
+  const { user: loggedInUser, token } = useUser();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
 
@@ -27,9 +30,27 @@ function PhotoDetail() {
   }, [loggedInUser, user])
 
 
+  const handleDelete = async (photoId) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/photos/${photoId}/delete`, {
+        headers: {
+            Authorization: `Bearer ${token}`, // Attach token
+        },
+    })
 
+        // Update the UI by removing the deleted photo
+        setPhotos((prevPhotos) => prevPhotos.filter(photo => photo._id !== photoId));
 
-  console.log(isOwner);
+        // Update the photo count
+        setPhotosCount((prevCount) => prevCount - 1);
+
+        navigate('/gallery')
+
+    } catch (error) {
+        console.error(`Cannot delete photo: ${error.message}`);
+    }
+};
+
 
 
   if (isLoading) return <p>Loading photo...</p>;
@@ -57,7 +78,7 @@ function PhotoDetail() {
                   {/* X Button in the top-right corner */}
                   {isOwner && (
                     <button
-                    onClick={() => handleDelete(photo.id)} // Add your delete functionality
+                    onClick={() => handleDelete(photo._id)} // Add your delete functionality
                     className="text-gray-500 hover:text-gray-800"
                   >
                     X

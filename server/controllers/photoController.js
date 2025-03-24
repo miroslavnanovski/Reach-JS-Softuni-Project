@@ -153,9 +153,9 @@ photoController.delete("/:photoId/delete", Auth, async (req, res) => {
       return res.status(404).json({ message: "Photo not found" });
     }
 
-    // Optional: Ensure the user owns the photo before deleting
     
-    if (photo.user.toString() !== req.user.id) {
+    if (!photo.user.equals(req.user.userId)) {
+      
       return res.status(403).json({ message: "Unauthorized to delete this photo" });
     }
 
