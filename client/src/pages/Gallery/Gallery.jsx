@@ -13,7 +13,7 @@ export default function Gallery({ userId,onPhotosCountChange }) {
 
             const url = userId
                 ? `http://localhost:3000/api/photos?userId=${userId}`
-                : "http://localhost:3000/api/photos";
+                : "http://localhost:3000/api/photos?fetchAll=true";
 
             const res = await fetch(url , {
                 method: "GET"

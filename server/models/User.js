@@ -5,7 +5,10 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePicture: { type: String, default: "" },
-  description: {type:String, default: ""},
+  description: { type: String, default: "" },
+  favourites: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Photo" } // Reference the Photo model instead
+  ]
 }, { timestamps: true });
 
 export default mongoose.model("User", userSchema);

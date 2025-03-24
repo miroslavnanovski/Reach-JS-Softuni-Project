@@ -51,6 +51,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     
       // If we have valid data, store user and close modal
       loginUser(data);
+      setFormData({ email: "", password: "", username: "" });
       onClose();
     } catch (error) {
       console.error("Authentication Error:", error);
@@ -63,7 +64,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
 
   return isOpen ? (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/80">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
       <div className="bg-white p-6 rounded-xl shadow-lg w-96 relative">
         {/* Close Button Inside the Modal */}
         <button className="absolute top-2 right-3 text-gray-500 hover:text-gray-700" onClick={onClose}>

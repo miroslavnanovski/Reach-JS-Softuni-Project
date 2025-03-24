@@ -21,7 +21,6 @@ function App() {
     <UserProvider>
         <div className="bg-gray-100 min-h-screen">
           <Navbar/>
-          <div className="p-6">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/upload" element={<Upload />} />
@@ -31,7 +30,6 @@ function App() {
               <Route path="/:userId/settings" element={<UserSettings/>} />
               <Route path="/:userId/profile" element={<ProfileCard/>} />
             </Routes>
-          </div>
         </div>
       </UserProvider>
     </>

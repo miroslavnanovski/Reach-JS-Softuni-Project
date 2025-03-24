@@ -1,0 +1,66 @@
+import { useEffect, useState } from "react";
+import useFetchMultiplePhotos from "../../hooks/useFetchMultiplePhotos";
+import RecentUploads from "./RecentUploads";
+
+export default function SearchBarComponent({ onSearch }) {
+    const [query, setQuery] = useState('');
+    const [number,setNumber] = useState(0);
+
+    const photosCount = 10;
+
+
+    const photos = useFetchMultiplePhotos(photosCount);
+
+
+    useEffect(()=> {
+      const randomNumber = Math.floor(Math.random() * photosCount);
+      setNumber(randomNumber);
+    },[])
+    
+   
+    
+    
+    
+    
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSearch(query);
+      };
+
+    return (
+      <>
+      <div className="relative w-full h-[500px] bg-cover bg-center" style={{ backgroundImage: `url(${photos[number]?.imageUrl})` }}>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black/30"></div> 
+    
+      {/* Content */}
+      <div className="relative z-10 text-center text-white px-4 flex flex-col items-center justify-center h-full">
+        <h1 className="text-3xl md:text-4xl font-bold mb-6">
+        Upload your photos and explore images shared by people from all over the world.
+
+
+
+        </h1>
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center bg-white rounded-full shadow-md w-full max-w-2xl mx-auto overflow-hidden"
+        >
+          <input
+            type="text"
+            placeholder="Search for free photos"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="flex-1 px-4 py-3 focus:outline-none text-gray-800"
+          />
+          <div className="h-6 w-px bg-gray-300 mx-2" />
+          <button type="submit" className="px-4 py-3 text-gray-600 hover:text-black">
+            🔍
+          </button>
+        </form>
+      </div>
+    </div>
+      <RecentUploads/>
+    </>
+      );
+}

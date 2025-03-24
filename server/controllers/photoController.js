@@ -2,6 +2,7 @@ import express from "express";
 import { upload } from "../middlewares/cloudinary-middleware.js";
 import Photo from "../models/Photo.js";
 import Auth from "../middlewares/auth-middleware.js";
+import User from "../models/User.js";
 
 const photoController = express.Router();
 
@@ -43,22 +44,28 @@ photoController.post("/upload", Auth, upload.single("image"), async (req, res) =
 // Get all photos
 photoController.get("/", async (req, res) => {
   try {
-    const { userId } = req.query;  // Get userId from query parameters
-    let photos;
+    const { userId, count, fetchAll } = req.query;
 
-    if (userId) {
-      // If userId is provided, filter photos by the user's ObjectId
-      photos = await Photo.find({ user: userId }).populate();
-    } else {
-      // If no userId is provided, fetch all photos
-      photos = await Photo.find().populate();
+    const query = userId ? { user: userId } : {};
+
+    let photosQuery = Photo.find(query).sort({ createdAt: -1 }).populate();
+
+    // If fetchAll is NOT true, apply count limit
+    if (fetchAll !== "true") {
+      const limit = parseInt(count) || 10;
+      photosQuery = photosQuery.limit(limit);
     }
+
+    const photos = await photosQuery;
 
     res.json(photos);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Failed to fetch photos" });
   }
 });
+
+
 
 
 photoController.get("/:photoId", async (req, res) => {
@@ -127,24 +134,27 @@ photoController.post("/:photoId/like", Auth, async (req, res) => {
 photoController.post("/:photoId/favorite", Auth, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const photo = await Photo.findById(req.params.photoId);
+    const photoId = req.params.photoId;
 
-    if (!photo) return res.status(404).json({ message: "Photo not found" });
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const index = photo.favorites.indexOf(userId);
+    // Check if photo is already in favourites
+    const index = user.favourites.indexOf(photoId);
 
     if (index === -1) {
-      photo.favorites.push(userId); // Add to favorites
+      user.favourites.push(photoId); // Add to favorites
     } else {
-      photo.favorites.splice(index, 1); // Remove from favorites
+      user.favourites.splice(index, 1); // Remove from favorites
     }
 
-    await photo.save();
-    res.status(200).json(photo);
+    await user.save();
+    res.status(200).json({ message: "Favorite updated", favourites: user.favourites });
   } catch (error) {
     res.status(500).json({ message: "Error adding/removing favorite", error });
   }
 });
+
 
 photoController.delete("/:photoId/delete", Auth, async (req, res) => {
   try {
@@ -166,6 +176,19 @@ photoController.delete("/:photoId/delete", Auth, async (req, res) => {
     res.status(500).json({ message: "Error deleting photo!", error });
   }
 })
+
+photoController.get('/search', async (req, res) => {
+  try {
+    const query = req.query.query || '';
+    const photos = await Photo.find({
+      caption: { $regex: query, $options: 'i' } // case-insensitive
+    });
+
+    res.json(photos);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 

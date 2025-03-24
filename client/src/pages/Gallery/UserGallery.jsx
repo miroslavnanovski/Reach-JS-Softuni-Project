@@ -15,17 +15,7 @@ export default function UserGallery() {
         }
     }, [user]);
 
-    useEffect(() => {
-        // Retrieve saved count from localStorage on mount
-        const storedCount = Number(localStorage.getItem("photosCount")) || 0;
-        setPhotosCount(storedCount);
-        setIsLoading(false); // Stop loading when we have retrieved stored count
-    }, []);
 
-    useEffect(() => {
-        // Save the updated photosCount to localStorage whenever it changes
-        localStorage.setItem("photosCount", photosCount);
-    }, [photosCount]);
 
     // Function to update photos count
     const updatePhotosCount = (count) => {
@@ -53,14 +43,9 @@ export default function UserGallery() {
                 <div className="text-lg text-gray-600">{photosCount} results</div>
             </div>
             <hr className="border-gray-300 my-4" />
-
-            {isLoading ? (
-                <div className="text-center text-gray-500">Loading photos...</div>
-            ) : photosCount > 0 ? (
+            
                 <Gallery userId={userId} onPhotosCountChange={updatePhotosCount} />
-            ) : (
-                <NoContent />
-            )}
+          
         </>
     );
 }

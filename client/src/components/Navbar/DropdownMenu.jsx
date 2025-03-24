@@ -67,7 +67,7 @@ export default function DropdownMenu() {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden
+          className="absolute right-0 z-40 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden
           transition ease-out duration-100 transform opacity-100 scale-100"
           role="menu"
           aria-orientation="vertical"

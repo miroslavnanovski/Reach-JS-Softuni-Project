@@ -18,6 +18,7 @@ const photoSchema = new mongoose.Schema({
     ],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // List of user IDs who liked the photo
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  });
+  }, { timestamps: true })
+  ;
   
   export default mongoose.model("Photo", photoSchema);
