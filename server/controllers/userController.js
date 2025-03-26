@@ -106,6 +106,20 @@ userController.post("/update-password", Auth, async (req, res) => {
     }
 });
 
+
+userController.put('/description', Auth, async (req, res) => {
+  const { description } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, { description }, { new: true });
+    res.json({ message: "Description updated", description: updatedUser.description });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
   
 
 export default userController;

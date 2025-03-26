@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CommentsSection from "../../components/comments-section/CommentsSection";
 import useFetchSingle from "../../utils/useFetchSinglePhoto";
-import dateFormat from "../../utils/dateFormat";
 import useFetchUserById from "../../hooks/useFetchUserById";
 import { useUser } from "../../contexts/userContext";
 import axios from "axios";
 import DeletePhotoModal from "./DeletePhotoModal";
+import ResponsiveImage from "./ResponsiveImage";
 
 
 
@@ -15,14 +15,15 @@ function PhotoDetail() {
   const [isOwner, setIsOwner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { photoId } = useParams();
-  const { photo, isLoading } = useFetchSingle(photoId);
+  const { photo, isLoading, setPhoto } = useFetchSingle(photoId);
   const { user } = useFetchUserById(photo?.user);
 
   const { user: loggedInUser, token } = useUser();
   const navigate = useNavigate();
 
- 
-  
+
+
+
 
 
   useEffect(() => {
@@ -38,14 +39,14 @@ function PhotoDetail() {
 
   const handleDelete = async (photoId) => {
     if (!photoId) return;
-  
+
     try {
       await axios.delete(`http://localhost:3000/api/photos/${photoId}/delete`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       navigate('/user-gallery');
     } catch (error) {
       console.error(`Cannot delete photo: ${error.message}`);
@@ -56,7 +57,7 @@ function PhotoDetail() {
   if (isLoading) return <p>Loading photo...</p>;
   if (!photo) return <p>Photo not found.</p>;
 
-  const createdDate = dateFormat(photo.createdAt);
+
 
   const userProfilePicture = user?.profilePicture || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6tWkfCJfejkeaq78A0p6L5CZWFFVwxyz0DA&s';
 
@@ -71,44 +72,51 @@ function PhotoDetail() {
             <div className="flex flex-col md:flex-row">
 
               {/* Left Column: Photo & Description */}
-              <div className="w-full md:w-3/4 p-6">
+              <div className="w-full md:w-3/4 p-6 border-b border-gray-200">
                 <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
                   <span>{photo.caption}</span>
 
                   {/* X Button in the top-right corner */}
                   {isOwner && (
                     <>
-                    <button
-                    onClick={() => setIsModalOpen(true)} 
-                    className="text-gray-500 hover:text-gray-800"
-                  >
-                    X
-                  </button>
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="text-gray-500 hover:text-gray-800"
+                      >
+                        X
+                      </button>
 
-                  <DeletePhotoModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onDelete={() => handleDelete(photoId)}
-                  />
-                  </>
+                      <DeletePhotoModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onDelete={() => handleDelete(photoId)}
+                      />
+                    </>
                   )}
-                 
+
                 </h1>
 
-                <div className="mb-6">
-                  <img
-                    src={photo.imageUrl}
-                    alt={photo.caption}
-                    className="w-full h-auto max-h-[600px] object-cover rounded-md shadow"
-                  />
-                </div>
+                <ResponsiveImage
+                  src={photo.imageUrl}
+                  alt={photo.caption}
+                  photo={photo}
+                  photoId={photoId}
+                  token={token}
+                  currentUserId={loggedInUser?._id}
+                  onPhotoUpdate={setPhoto}
+                />
 
-                <p className="text-gray-700 mb-2">{photo.caption}</p>
+
+
+                <div className="mt-10"></div>
+                <p className="text-gray-700 mb-4">{photo.caption}</p>
+
               </div>
 
 
               {/* Right Column: User Info */}
-              <aside className="w-full md:w-1/4 p-6 border-t md:border-t-0 md:border-l border-gray-200">
+              <aside className="w-full md:w-1/4 p-6 border-t md:border-t-0 md:border-l border-b border-gray-200">
+
                 {/* User Info */}
                 <div className="flex items-center mb-4">
                   <img
@@ -118,7 +126,6 @@ function PhotoDetail() {
                   />
                   <div>
                     <p className="font-semibold text-gray-700">{user?.username}</p>
-                    <p className="text-sm text-gray-500">{photo.createdAt}</p>
                   </div>
                 </div>
                 {/* Stats */}
@@ -133,12 +140,12 @@ function PhotoDetail() {
               </aside>
             </div>
 
-          
-              <CommentsSection photo={photo} />
+
+            <CommentsSection photo={photo} />
 
 
             {/* Bottom Section: Comments */}
-            
+
             {/* Comment listing here */}
           </div>
         </div>

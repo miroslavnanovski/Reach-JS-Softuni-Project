@@ -30,7 +30,7 @@ export default function SearchBarComponent({ onSearch }) {
 
     return (
       <>
-      <div className="relative w-full h-[500px] bg-cover bg-center" style={{ backgroundImage: `url(${photos[number]?.imageUrl})` }}>
+      <div className="relative w-full h-[400px] bg-cover bg-center" style={{ backgroundImage: `url(${photos[number]?.imageUrl})` }}>
   {/* Overlay */}
   <div className="absolute inset-0 bg-black/30"></div> 
     
