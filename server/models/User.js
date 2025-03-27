@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profilePicture: { type: String, default: "" },
   description: { type: String, default: "" },
-  favourites: [
+  favorites: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Photo" } // Reference the Photo model instead
   ]
 }, { timestamps: true });

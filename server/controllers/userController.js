@@ -31,6 +31,16 @@ userController.post("/update-email", Auth, async (req, res) => {
   }
 });
 
+userController.get('/count', async (req, res) => {
+  try {
+      const count = await User.countDocuments({});
+      res.json({ userCount: count });
+  } catch (error) {
+      console.error('Error fetching user count:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
 userController.get('/:userId', async (req, res) => {
   const { userId } = req.params;
 
@@ -44,15 +54,7 @@ userController.get('/:userId', async (req, res) => {
   }
 });
 
-userController.get('/count', async (req, res) => {
-  try {
-      const count = await User.countDocuments({});
-      res.json({ userCount: count });
-  } catch (error) {
-      console.error('Error fetching user count:', error);
-      res.status(500).json({ message: 'Server error' });
-  }
-});
+
 
 
 

@@ -1,36 +1,52 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GalleryItem from "./GalleryItem";
 import Masonry from "react-masonry-css";
 import "./Gallery.css"
+import axios from "axios";
+
 
 export default function Gallery({ userId,onPhotosCountChange }) {
     const [photos, setPhotos] = useState([]);
+
  
 
     useEffect(() => {
 
         const getPhotos = async () => {
+            try {
+              let loadedPhotos;
+          
+              if (userId) {
+                
+                const res = await axios.get(`http://localhost:3000/api/photos`, {
+                  params: {
+                    userId: userId,
+                    fetchAll: true,
+                  },
+                });
+                loadedPhotos = res.data; 
 
-            const url = userId
-                ? `http://localhost:3000/api/photos?userId=${userId}`
-                : "http://localhost:3000/api/photos?fetchAll=true";
+              } else {
 
-            const res = await fetch(url , {
-                method: "GET"
-            });
-
-            const loadedPhotos = await res.json();
-               
-
-            setPhotos(loadedPhotos);
-            onPhotosCountChange(loadedPhotos.length);
-
-
-        }
-        getPhotos();
-    
+                const res = await axios("http://localhost:3000/api/photos?fetchAll=true", {
+                  method: "GET",
+                });
+                loadedPhotos = await res.data;
+              }
+          
+              setPhotos(loadedPhotos);
+              onPhotosCountChange(loadedPhotos.length);
+            } catch (error) {
+              console.error("Error loading photos:", error);
+            }
+          };
+          
+          getPhotos();
+          
         
     }, [userId, onPhotosCountChange])
+
+
 
     const breakpointColumns = {
         default: 4,

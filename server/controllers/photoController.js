@@ -66,6 +66,15 @@ photoController.get("/", async (req, res) => {
 });
 
 
+photoController.get('/count', async (req, res) => {
+  try {
+    const count = await Photo.countDocuments({});
+    res.json({ photoCount: count });
+  } catch (error) {
+    console.error('Error fetching photo count:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 photoController.get("/:photoId", async (req, res) => {
@@ -140,16 +149,16 @@ photoController.post("/:photoId/favorite", Auth, async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Check if photo is already in favourites
-    const index = user.favourites.indexOf(photoId);
+    const index = user.favorites.indexOf(photoId);
 
     if (index === -1) {
-      user.favourites.push(photoId); // Add to favorites
+      user.favorites.push(photoId); // Add to favorites
     } else {
-      user.favourites.splice(index, 1); // Remove from favorites
+      user.favorites.splice(index, 1); // Remove from favorites
     }
 
     await user.save();
-    res.status(200).json({ message: "Favorite updated", favourites: user.favourites });
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: "Error adding/removing favorite", error });
   }
@@ -189,6 +198,8 @@ photoController.get('/search', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
 
 
 

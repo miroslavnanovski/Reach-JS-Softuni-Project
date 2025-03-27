@@ -7,14 +7,25 @@ import PhotoDetail from "./pages/Gallery/PhotoDetails";
 import Navbar from "./components/Navbar/Navbar";
 import UserSettings from "./pages/UserSettings/UserSettings";
 import ProfileCard from "./pages/Profile/ProfileCard";
-import { UserProvider } from "./contexts/userContext";
+import { UserProvider, useUser } from "./contexts/userContext";
 import UserGallery from "./pages/Gallery/UserGallery";
+import AboutPage from "./pages/About";
 
 
 
 function App() {
 
+  const { loading } = useUser();
 
+
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-lg font-semibold animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -29,6 +40,7 @@ function App() {
               <Route path="/user-gallery" element={<UserGallery/>} />
               <Route path="/:userId/settings" element={<UserSettings/>} />
               <Route path="/:userId/profile" element={<ProfileCard/>} />
+              <Route path="/about-us" element={<AboutPage/>} />
             </Routes>
         </div>
       </UserProvider>

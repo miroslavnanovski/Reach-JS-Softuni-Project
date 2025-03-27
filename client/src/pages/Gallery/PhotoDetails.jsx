@@ -1,6 +1,6 @@
 // PhotoDetail.js
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CommentsSection from "../../components/comments-section/CommentsSection";
 import useFetchSingle from "../../utils/useFetchSinglePhoto";
 import useFetchUserById from "../../hooks/useFetchUserById";
@@ -8,6 +8,7 @@ import { useUser } from "../../contexts/userContext";
 import axios from "axios";
 import DeletePhotoModal from "./DeletePhotoModal";
 import ResponsiveImage from "./ResponsiveImage";
+import { X } from 'lucide-react';
 
 
 
@@ -17,11 +18,17 @@ function PhotoDetail() {
   const { photoId } = useParams();
   const { photo, isLoading, setPhoto } = useFetchSingle(photoId);
   const { user } = useFetchUserById(photo?.user);
-
   const { user: loggedInUser, token } = useUser();
+  const [localUser, setLocalUser] = useState(loggedInUser);
+
+
+
+
   const navigate = useNavigate();
 
-
+  useEffect(() => {
+    setLocalUser(loggedInUser);
+  }, [loggedInUser]);
 
 
 
@@ -68,23 +75,26 @@ function PhotoDetail() {
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-7xl mx-auto bg-white shadow rounded-md overflow-hidden">
 
+
             {/* Top Section: Photo (Left) & User Info (Right) */}
             <div className="flex flex-col md:flex-row">
 
               {/* Left Column: Photo & Description */}
               <div className="w-full md:w-3/4 p-6 border-b border-gray-200">
+
                 <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
                   <span>{photo.caption}</span>
 
                   {/* X Button in the top-right corner */}
                   {isOwner && (
                     <>
-                      <button
+
+                      <X
                         onClick={() => setIsModalOpen(true)}
-                        className="text-gray-500 hover:text-gray-800"
-                      >
-                        X
-                      </button>
+                        className="cursor-pointer transition-transform duration-200 hover:rotate-90 hover:scale-110 hover:text-red-600"
+                      />
+
+
 
                       <DeletePhotoModal
                         isOpen={isModalOpen}
@@ -102,14 +112,22 @@ function PhotoDetail() {
                   photo={photo}
                   photoId={photoId}
                   token={token}
-                  currentUserId={loggedInUser?._id}
+                  currentUserId={localUser?._id}
                   onPhotoUpdate={setPhoto}
+                  onUserUpdate={setLocalUser}
+                  favorites={localUser?.favorites || []}
                 />
 
 
 
+
                 <div className="mt-10"></div>
-                <p className="text-gray-700 mb-4">{photo.caption}</p>
+
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-closed-captioning text-gray-800"></i>
+                  <p className="text-gray-700 mb-0">{photo.caption}</p>
+                </div>
+
 
               </div>
 

@@ -7,7 +7,13 @@ import {  useUser } from "../../contexts/userContext";
 export default function Navbar() {
     const [current,setCurrent] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { user } = useUser();
+    const { user, loading } = useUser();
+
+    if (loading) {
+      return (
+        <div className="h-16 bg-gray-800 animate-pulse"></div>
+      );
+    }
 
    
    
@@ -59,13 +65,17 @@ export default function Navbar() {
       </>
       
       }
+
+      <Link
+        to="/about-us"
+        className={`rounded-md px-3 py-2 text-sm font-medium ${
+          current === "about-us" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        }`}
+        onClick={() => setCurrent("about-us")}
+      >
+        About
+      </Link>
      
-            <a
-              href="#"
-              className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >
-              About
-            </a>
           </div>
         </div>
       </div>
