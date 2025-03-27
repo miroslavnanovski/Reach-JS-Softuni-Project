@@ -54,13 +54,22 @@ export default function Navbar() {
       </Link>
 
       <Link
-        to="/user-gallery"
+        to="/my-uploads"
         className={`rounded-md px-3 py-2 text-sm font-medium ${
-          current === "user-gallery" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          current === "my-uploads" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
         }`}
-        onClick={() => setCurrent("user-gallery")}
+        onClick={() => setCurrent("my-uploads")}
       >
-        User Gallery
+        My Uploads
+      </Link>
+      <Link
+        to="/favorites"
+        className={`rounded-md px-3 py-2 text-sm font-medium ${
+          current === "my-favorites" ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        }`}
+        onClick={() => setCurrent("my-favorites")}
+      >
+        My Favorites
       </Link>
       </>
       

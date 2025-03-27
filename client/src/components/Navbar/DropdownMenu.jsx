@@ -9,7 +9,7 @@ export default function DropdownMenu() {
   const navigate = useNavigate();
 
   const { logoutUser } = useUser();
-  
+
 
   const handleLogout = () => {
     logoutUser();
@@ -48,32 +48,35 @@ export default function DropdownMenu() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             type="button"
-            className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+            className="relative flex items-center justify-center rounded-full transition-transform duration-200 hover:scale-105 focus:outline-none"
             id="user-menu-button"
             aria-expanded={isOpen}
             aria-haspopup="true"
           >
-            <span className="absolute -inset-1.5" />
             <span className="sr-only">Open user menu</span>
             <img
-              className="size-8 rounded-full"
               src={user.profilePicture}
-              alt=""
+              alt="User avatar"
+              className="w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-white transition duration-200"
             />
           </button>
+
+
+
         </div>
       </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 z-40 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden
-          transition ease-out duration-100 transform opacity-100 scale-100"
+          className="absolute right-0 z-40 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5
+          transition-all duration-200 transform ease-out opacity-100 scale-100 animate-fade"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="user-menu-button"
           tabIndex={-1}
         >
+
           <Link
             onClick={() => setIsOpen(!isOpen)}
             to={`/${user._id}/profile`}

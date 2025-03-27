@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import Auth from "../middlewares/auth-middleware.js";
 import { upload } from "../middlewares/cloudinary-middleware.js";
+import Photo from "../models/Photo.js";
 
 const userController = express.Router();
 
@@ -120,6 +121,28 @@ userController.put('/description', Auth, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+userController.get('/:userId/favorites', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const reversedIds = [...user.favorites].reverse(); // newest first
+
+    // Fetch all photos
+    const photos = await Photo.find({ _id: { $in: reversedIds } });
+
+    // Sort to match the reversed favorites order
+    const photoMap = new Map(photos.map(p => [p._id.toString(), p]));
+    const sortedPhotos = reversedIds.map(id => photoMap.get(id.toString())).filter(Boolean);
+
+    res.json(sortedPhotos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
   

@@ -3,6 +3,7 @@ import EmailInput from "./EmailInput";
 import axios from "axios";
 import useFetchUser from "../../utils/useFetchUser";
 import PasswordInput from "./PasswordInput";
+import { useUser } from "../../contexts/userContext";
 
 export default function UserSettings() {
   const [isChangeOpen, setIsChangeOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function UserSettings() {
 
   const token = localStorage.getItem('Authorization');
 
-  const user = useFetchUser(); 
+  const {user} = useUser()
 
   
   useEffect(() => {
