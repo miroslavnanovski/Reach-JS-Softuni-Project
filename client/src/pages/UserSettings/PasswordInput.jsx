@@ -13,6 +13,8 @@ export default function PasswordInput() {
 
     const handleChange = (e) => {
         const {name,value } = e.target;
+        setError('');
+        setSuccessMessage('');
         if (name === "currentPassword") setCurrentPassword(value);
         if (name === "newPassword") setNewPassword(value);
         if (name === "confirmPassword") setConfirmPassword(value);
@@ -120,8 +122,8 @@ export default function PasswordInput() {
 
     {/* TODO: Implement a better looking notification */}
 
-    {error && <p className="error-message">{error}</p>}
-    {successMessage && <p className="success-message">{successMessage}</p>}
+    {error && <p className="text-red-500 text-sm mt-1 ps-2">{error}</p>}
+    {successMessage && <p className="text-green-500 text-sm mt-1 ps-2">{successMessage}</p>}
 
     <button 
         onClick={handleSubmit}

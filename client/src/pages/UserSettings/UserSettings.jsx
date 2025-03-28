@@ -8,47 +8,62 @@ import { useUser } from "../../contexts/userContext";
 export default function UserSettings() {
   const [isChangeOpen, setIsChangeOpen] = useState(false);
   const [email, setEmail] = useState('')
-  const [emailDisplay,setEmailDisplay] = useState('')
+  const [emailDisplay, setEmailDisplay] = useState('')
+  const [error, setError] = useState('');
 
   const token = localStorage.getItem('Authorization');
 
-  const {user} = useUser()
+  const { user } = useUser()
 
-  
+
   useEffect(() => {
     if (user && user.email) {
       setEmailDisplay(user.email);
     }
   }, [user]);
-  
 
 
-  
+
+
 
   const handleEmailChange = (email) => {
-    setEmail(email);  
+    setEmail(email);
+    setError('');
   };
 
   const handleSubmit = async (newEmail) => {
-    if (!email) return; // Prevent empty submissions
+    if (!newEmail) {
+      setError('Email field cannot be empty!');
+      return;
+    }
+
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail);
+    if (!isValidEmail) {
+      setError('Please enter a valid email address.');
+      return;
+    }
 
     try {
-      const response = await axios.post(`http://localhost:3000/api/user/update-email`,
-         {newEmail},
-         {
-          headers:{
-            'Authorization': `Bearer ${token}`
-          }
-         }
-        );
-      setEmailDisplay(newEmail);
-      setIsChangeOpen(!isChangeOpen)
+      const response = await axios.post(
+        `http://localhost:3000/api/user/update-email`,
+        { newEmail },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
 
+      setEmailDisplay(newEmail);
+      setIsChangeOpen(false);
+      setError(""); // Clear error on success
       console.log("API Response: success");
     } catch (error) {
       console.error("API Error:", error);
+      setError("Failed to update email. Please try again.");
     }
   };
+
 
   return (
     <div className="mx-4 min-h-screen max-w-screen-xl sm:mx-8 xl:mx-auto">
@@ -62,38 +77,51 @@ export default function UserSettings() {
         <p className="py-2 text-xl font-semibold">Email Address</p>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
 
-          {isChangeOpen ?
-            <EmailInput onEmailChange={handleEmailChange} className="absolute" /> :
+          {isChangeOpen ? (
+            <EmailInput
+              onEmailChange={handleEmailChange}
+              error={error}
+              className="absolute"
+            />
+          ) : (
             <p>Your email address is <strong>{emailDisplay}</strong></p>
-          }
+          )}
+
+
+         
 
 
           {isChangeOpen ?
-          <>
-          <div className="flex gap-3">
-            <button
-            onClick={() => handleSubmit(email)}
-            className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-              Submit
-          </button>  
+            <>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleSubmit(email)}
+                  className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
+                  Submit
+                </button>
 
-          <button
-           onClick={() => setIsChangeOpen(!isChangeOpen)}
-            className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-              Cancel
-          </button> 
-          </div>
-          </>
-          :
+                <button
+                  onClick={() => {
+                    setError('');
+                    setIsChangeOpen(!isChangeOpen);
+                  }}
+                  className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
+                  Cancel
+                </button>
+              </div>
+            </>
+            :
             <button
-              onClick={() => setIsChangeOpen(!isChangeOpen)}
+              onClick={() =>
+                setIsChangeOpen(!isChangeOpen)
+              }
               className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-                Change
+              Change
             </button>
           }
         </div>
 
-        <PasswordInput/>
+        <PasswordInput />
 
         {/* <p className="mt-2">
           Can't remember your current password.{" "}
@@ -106,7 +134,7 @@ export default function UserSettings() {
         </p> */}
 
 
-        
+
         <hr className="mt-4 mb-8" />
         <div className="mb-10">
           <p className="py-2 text-xl font-semibold">Delete Account</p>

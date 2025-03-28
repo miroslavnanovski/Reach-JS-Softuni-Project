@@ -44,13 +44,23 @@ photoController.post("/upload", Auth, upload.single("image"), async (req, res) =
 // Get all photos
 photoController.get("/", async (req, res) => {
   try {
-    const { userId, count, fetchAll } = req.query;
+    const { userId, count, fetchAll, search } = req.query;
 
-    const query = userId ? { user: userId } : {};
+    const query = {};
 
-    let photosQuery = Photo.find(query).sort({ createdAt: -1 }).populate();
+    // If userId is provided, filter by user
+    if (userId) {
+      query.user = userId;
+    }
 
-    // If fetchAll is NOT true, apply count limit
+    // If search is provided, add a case-insensitive regex for the caption
+    if (search) {
+      query.caption = { $regex: search, $options: "i" };
+    }
+
+    let photosQuery = Photo.find(query).sort({ createdAt: -1 }).populate("user");
+
+    // Limit results unless fetchAll is explicitly true
     if (fetchAll !== "true") {
       const limit = parseInt(count) || 10;
       photosQuery = photosQuery.limit(limit);

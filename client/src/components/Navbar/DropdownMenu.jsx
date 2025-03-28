@@ -13,6 +13,7 @@ export default function DropdownMenu() {
 
   const handleLogout = () => {
     logoutUser();
+    setIsOpen(false)
     navigate("/");
   };
 

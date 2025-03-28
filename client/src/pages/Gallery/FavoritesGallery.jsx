@@ -5,6 +5,7 @@ import axios from "axios";
 
 export default function FavoritesGallery(){
     const [favorites,setFavorites] = useState([]);
+    const [loading,setLoading] = useState(true);
     const { user } = useUser();
     const userId = user?._id
     
@@ -17,12 +18,13 @@ export default function FavoritesGallery(){
                     const res = await axios.get(`http://localhost:3000/api/user/${userId}/favorites/`);
                     const photos = await res.data;
                     setFavorites(photos);
+                    setLoading(false)
                 } catch (error) {
                     console.error('Error fetching favorite photos:', error);
                 }
             };
     
-            fetchFavoritePhotos(); // 👈 You forgot to call it
+            fetchFavoritePhotos(); 
         }
     }, [user]);
     
@@ -31,7 +33,7 @@ export default function FavoritesGallery(){
 
     return (
         <>
-        <FavoritesCarousel favorites={favorites}/>
+        <FavoritesCarousel favorites={favorites} loading={loading}/>
         </>
     )
 

@@ -1,5 +1,5 @@
 
-import UploadButton from '../components/UploadButton';
+import UploadButton from './UploadButton';
 
 export default function Upload() {
 
