@@ -15,6 +15,7 @@ import { useUIStore } from "./stores/uiStore";
 import AuthModal from "./components/Navbar/authModal";
 import RouteGuard from "./utils/routeGuard";
 import { Toaster } from "react-hot-toast";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const loginModalOpen = useUIStore((state) => state.loginModalOpen);
@@ -46,6 +47,8 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/gallery/:photoId" element={<PhotoDetail />} />
           <Route path="/about-us" element={<AboutPage />} />
+          <Route path="*" element={<NotFound />} />
+
 
           {/* Grouped protected routes */}
           <Route element={<RouteGuard />}>

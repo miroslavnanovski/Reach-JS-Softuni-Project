@@ -11,7 +11,7 @@ export default function UploadButton() {
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
-  const [uploadStatus, setUploadStatus] = useState(""); // "success" | "error"
+  const [uploadStatus, setUploadStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [progress, setProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -24,7 +24,7 @@ const userId = decoded?.userId || decoded?.id;
 
 if (!userId) {
   console.warn("No valid user ID found in token");
-  return null; // or show fallback UI
+  return null; 
 }
   const navigate = useNavigate();
 
