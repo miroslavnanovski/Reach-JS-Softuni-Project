@@ -4,10 +4,13 @@ export default function useFetchSingle(photoId) {
   const [photo, setPhoto] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
+
+
   const fetchPhoto = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/api/photos/${photoId}`);
+      const res = await fetch(`${URL}/api/photos/${photoId}`);
       if (!res.ok) throw new Error("Failed to fetch photo");
 
       const loadedPhoto = await res.json();

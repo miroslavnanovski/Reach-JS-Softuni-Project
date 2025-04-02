@@ -5,12 +5,14 @@ export default function AboutPage() {
   const [userCount, setUserCount] = useState(0);
   const [photoCount, setPhotoCount] = useState(0);
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     // Replace these with your actual API calls
     const fetchStats = async () => {
       try {
-        const userRes = await axios.get("http://localhost:3000/api/user/count");
-        const photoRes = await axios.get("http://localhost:3000/api/photos/count");
+        const userRes = await axios.get(`${URL}/api/user/count`);
+        const photoRes = await axios.get(`${URL}/api/photos/count`);
 
         const userData = await userRes.data;
         const photoData = await photoRes.data;

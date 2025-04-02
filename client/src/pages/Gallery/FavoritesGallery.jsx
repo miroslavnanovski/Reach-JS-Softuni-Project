@@ -9,13 +9,14 @@ export default function FavoritesGallery(){
     const { user } = useUser();
     const userId = user?._id
     
+    const URL = import.meta.env.VITE_API_BASE_URL;
     
 
     useEffect(() => {
         if (user) {
             const fetchFavoritePhotos = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:3000/api/user/${userId}/favorites/`);
+                    const res = await axios.get(`${URL}/api/user/${userId}/favorites/`);
                     const photos = await res.data;
                     setFavorites(photos);
                     setLoading(false)

@@ -8,6 +8,7 @@ import axios from "axios";
 export default function Gallery({ userId,onPhotosCountChange }) {
     const [photos, setPhotos] = useState([]);
 
+    const URL = import.meta.env.VITE_API_BASE_URL;
  
 
     useEffect(() => {
@@ -18,7 +19,7 @@ export default function Gallery({ userId,onPhotosCountChange }) {
           
               if (userId) {
                 
-                const res = await axios.get(`http://localhost:3000/api/photos`, {
+                const res = await axios.get(`${URL}/api/photos`, {
                   params: {
                     userId: userId,
                     fetchAll: true,
@@ -28,14 +29,17 @@ export default function Gallery({ userId,onPhotosCountChange }) {
 
               } else {
 
-                const res = await axios("http://localhost:3000/api/photos?fetchAll=true", {
+                const res = await axios(`${URL}/api/photos?fetchAll=true`, {
                   method: "GET",
                 });
                 loadedPhotos = await res.data;
               }
           
               setPhotos(loadedPhotos);
-              onPhotosCountChange(loadedPhotos.length);
+
+              if (onPhotosCountChange) {
+                onPhotosCountChange(loadedPhotos.length);
+              }
             } catch (error) {
               console.error("Error loading photos:", error);
             }

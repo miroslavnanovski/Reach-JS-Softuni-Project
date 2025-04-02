@@ -12,7 +12,11 @@ const Auth = (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log("Decoded Token:", decoded); // Debugging
 
-      req.user = { userId: decoded.userId }; // ✅ Attach user to request
+      req.user = {
+        userId: decoded.userId || decoded.id, // ✅ supports both new and old tokens
+        email: decoded.email,
+      };
+      
       
       
       next();

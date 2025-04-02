@@ -13,6 +13,11 @@ dotenv.config();
 // Use Mongoose for MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
 
+const allowedOrigins = [
+  "https://my-test-project-25338.web.app",
+  "http://localhost:5173" // for local dev
+];
+
 async function connectDB() {
   try {
     await mongoose.connect(MONGO_URI, {
@@ -25,12 +30,16 @@ async function connectDB() {
   }
 }
 
+
 connectDB();
 
 const app = express();
 app.use(express.json());
 app.use(logCRUDOperations);
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // API Routes
 app.use("/api/photos", photoRoutes);

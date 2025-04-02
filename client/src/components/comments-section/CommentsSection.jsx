@@ -9,10 +9,11 @@ export default function CommentsSection({ photo }) {
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
   const { photoId } = useParams();
-  const token = localStorage.getItem('Authorization');
+ 
 
-  const { user } = useUser();
+  const { user, token } = useUser();
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
 
 
 
@@ -38,7 +39,7 @@ export default function CommentsSection({ photo }) {
   const handlePostComment = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/photos/${photoId}/comment`,
+        `${URL}/api/photos/${photoId}/comment`,
         { text: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -54,6 +55,10 @@ export default function CommentsSection({ photo }) {
     }
   };
 
+  const handleCommentDelete = (deletedCommentId) => {
+    setComments((prev) => prev.filter((c) => c._id !== deletedCommentId));
+  };
+
 
 
 
@@ -61,9 +66,11 @@ export default function CommentsSection({ photo }) {
     <section className="relative">
   <div className="w-full max-w-7xl px-4 md:px-5 lg:px-5 mx-auto">
     <div className="w-full flex-col justify-start items-start lg:gap-14 gap-7 inline-flex">
-      <h2 className="w-full text-gray-900 text-4xl font-bold font-manrope leading-normal">
+      <h2 className="w-full text-gray-900 pt-8 text-4xl font-bold font-manrope leading-normal">
         Comments
       </h2>
+
+      {/* Comments posting form  */}
 
       {user && (
         <div className="w-full flex-col justify-start items-start gap-5 flex">
@@ -92,13 +99,18 @@ export default function CommentsSection({ photo }) {
         </div>
       )}
 
-      {/* Empty comment container — keep it if needed, or remove */}
-      <div className="w-full flex-col justify-start items-start gap-8 flex"></div>
+       {/* Comments posting form End */}
 
       {/* Comments list */}
       <div className="w-full flex-col justify-start items-start gap-8 flex">
-        {comments.map((comment) => (
-          <SingleComment key={comment._id} comment={comment} />
+
+        {comments.map((comment,index) => (
+          <SingleComment key={comment._id}
+          comment={comment}
+          isLast={index === comments.length - 1}
+          onDelete={handleCommentDelete}
+          photo={photo}
+          />
         ))}
       </div>
     </div>

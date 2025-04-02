@@ -2,43 +2,46 @@ import { useEffect, useState } from "react";
 import useFetchMultiplePhotos from "../../hooks/useFetchMultiplePhotos";
 import axios from "axios";
 import SearchModal from "./SearchModal";
+import { motion } from "framer-motion";
 
 export default function SearchBarComponent({ onSearch }) {
-    const [query, setQuery] = useState('');
-    const [number,setNumber] = useState(0);
-    const [showModal, setShowModal] = useState(false);
-    const [results, setResults] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [number, setNumber] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const photosCount = 10;
+  const URL = import.meta.env.VITE_API_BASE_URL;
 
-    const photos = useFetchMultiplePhotos(photosCount);
+  const photosCount = 10;
 
-    useEffect(()=> {
-      const randomNumber = Math.floor(Math.random() * photosCount);
-      setNumber(randomNumber);
-    },[])
-    
+  const photos = useFetchMultiplePhotos(photosCount);
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if (!query.trim()) return;
-  
-      setLoading(true);
-      try {
-        const res = await axios.get(`http://localhost:3000/api/photos?search=${encodeURIComponent(query)}&count=10`);
-        const data = await res.data;
-        setResults(data);
-        setShowModal(true);
-      } catch (err) {
-        console.error("Search error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
+    const randomNumber = Math.floor(Math.random() * photosCount);
+    setNumber(randomNumber);
+  }, [])
 
-    return (
-      <>
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    setLoading(true);
+    try {
+      const res = await axios.get(`${URL}/api/photos?search=${encodeURIComponent(query)}&count=10`);
+      const data = await res.data;
+      setResults(data);
+      setShowModal(true);
+    } catch (err) {
+      console.error("Search error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
       <div
         className="relative w-full h-[400px] bg-cover bg-center"
         style={{ backgroundImage: `url(${photos[number]?.imageUrl})` }}
@@ -60,10 +63,19 @@ export default function SearchBarComponent({ onSearch }) {
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 px-4 py-3 focus:outline-none text-gray-800"
             />
-            <div className="h-6 w-px bg-gray-300 mx-2" />
-            <button type="submit" className="px-4 py-3 text-gray-600 hover:text-black">
+
+            <motion.button
+              type="submit"
+              className="px-4 py-3 text-gray-600 hover:text-black"
+              whileHover={{
+                scale: 1.15,
+                rotate: -5,
+                color: "#000", // optional, to match `hover:text-black`
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
               🔍
-            </button>
+            </motion.button>
           </form>
         </div>
       </div>
@@ -73,9 +85,11 @@ export default function SearchBarComponent({ onSearch }) {
           query={query}
           loading={loading}
           results={results}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+          setShowModal(false)
+          setQuery('')}}
         />
       )}
     </>
-      );
+  );
 }

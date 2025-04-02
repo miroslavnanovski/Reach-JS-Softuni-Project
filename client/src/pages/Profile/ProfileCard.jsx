@@ -1,18 +1,31 @@
-import { useContext, useEffect, useState } from "react";
-import { UserContext, useUser } from "../../contexts/userContext";
+import { useEffect, useState } from "react";
+import { useUser } from "../../contexts/userContext";
+import useFetchMultiplePhotos from "../../hooks/useFetchMultiplePhotos";
+import { AnimatePresence, motion } from "framer-motion";
+
 
 export default function ProfileCard() {
   const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null)
-  const { user, token } = useUser();
+  const [preview, setPreview] = useState(null);
+  const [number, setNumber] = useState(0);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const { user, token } = useUser();
   const [description, setDescription] = useState(user?.description || "");
 
+  const photosCount = 5;
+  const defaultCover = 'https://images.pexels.com/photos/17052292/pexels-photo-17052292/free-photo-of-scenic-view-of-a-mountain-range.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+  const photos = useFetchMultiplePhotos(photosCount);
+  const profilePicture = user?.profilePicture || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=";
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
 
-
-  const profilePicture = user?.profilePicture || "https://i.pravatar.cc/300"; // Fallback image if no profile picture
+  useEffect(() => {
+    if (photos.length > 0) {
+      const randomNumber = Math.floor(Math.random() * photos.length);
+      setNumber(randomNumber);
+    }
+  }, [photos]);
 
   useEffect(() => {
     if (user?.description) {
@@ -20,49 +33,46 @@ export default function ProfileCard() {
     }
   }, [user]);
 
+  // ✅ Preview logic with cleanup
+  useEffect(() => {
+    if (!file) {
+      setPreview(null);
+      return;
+    }
 
+    const objectUrl = window.URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    return () => window.URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setIsUploaded(false)
-
-      // Create a URL for preview
-      const objectUrl = URL.createObjectURL(selectedFile);
-      setPreview(objectUrl);
+      setIsUploaded(false);
     }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      alert("Please select an image first!");
-      return;
-    }
-
-    console.log("Sending token:", token);  // Debugging log
-
-    if (!token) {
-      alert("You are not authenticated!");
-      return;
-    }
+    if (!file) return alert("Please select an image first!");
+    if (!token) return alert("You are not authenticated!");
 
     const formData = new FormData();
-    formData.append("image", file); // Match the key "image" with your backend
+    formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:3000/api/user/profile-picture", {
+      const response = await fetch(`${URL}/api/user/profile-picture`, {
         method: "PUT",
         body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token for authentication
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await response.json();
+
       if (response.ok) {
         alert("Profile picture updated successfully!");
-        setPreview(data.profilePicture); // Update UI with new image URL
+        setPreview(data.profilePicture);
         setIsUploaded(true);
       } else {
         alert(data.message);
@@ -74,14 +84,11 @@ export default function ProfileCard() {
   };
 
   const handleDescriptionUpdate = async () => {
-    if (!token) {
-      alert("You are not authenticated!");
-      return;
-    }
+    if (!token) return alert("You are not authenticated!");
 
     try {
-      const response = await fetch("http://localhost:3000/api/user/description", {
-        method: "PUT", // or POST depending on your backend
+      const response = await fetch(`${URL}/api/user/description`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -103,82 +110,84 @@ export default function ProfileCard() {
     }
   };
 
-
-
   return (
-    <div className="bg-gradient-to-r min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full p-8 transition-all duration-300 animate-fade-in">
-        <div className="flex flex-col md:flex-row">
-          {/* Profile Image & Info */}
-          <div className="md:w-1/3 text-center mb-8 md:mb-0">
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center px-4 py-10">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-2xl"
+      >
+        <div className="rounded-xl overflow-hidden shadow-xl bg-white bg-opacity-80 backdrop-blur-md text-center">
+          {/* Cover + Profile Picture */}
+          <div className="relative h-48">
             <img
-              src={preview || profilePicture}
-              alt="Profile Picture"
-              className="rounded-full w-48 h-48 mx-auto mb-4 border-4 border-blue-800 transition-transform duration-300 hover:scale-105"
+              src={photos[number]?.imageUrl || defaultCover}
+              alt="Cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <h1 className="text-2xl font-bold text-blue-600 mb-2">John Doe</h1>
-
-            {/* Hidden file input */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              id="fileInput"
-            />
-            <label
-              htmlFor="fileInput"
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition-colors duration-300 cursor-pointer"
-            >
-              Select Profile Picture
-            </label>
-
-            {(file && !isUploaded) && (
-              <button
-                onClick={handleUpload}
-                className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-900 transition-colors duration-300"
-              >
-                Upload
-              </button>
-            )}
+            <div className="absolute bottom-[-2rem] left-1/2 transform -translate-x-1/2">
+              <img
+                src={preview || profilePicture}
+                alt="Profile"
+                className="w-32 h-32 rounded-full border-4 border-white shadow-md object-cover"
+              />
+            </div>
           </div>
 
-          {/* About & Skills */}
-          <div className="md:w-2/3 md:pl-8">
+          {/* User Info */}
+          <div className="mt-20 px-6 pb-8 pt-4">
+            <h1 className="text-2xl font-bold text-gray-800">{user?.username || "Anonymous"}</h1>
 
-            {isEditingDescription ? (
-              <>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2 border rounded-md mb-2"
-                  rows="4"
-                />
-                <div className="flex gap-2">
+            <AnimatePresence mode="wait">
+              {isEditingDescription ? (
+                <motion.div
+                  key="edit"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full p-3 border rounded-md mb-3 resize-none"
+                    rows="4"
+                  />
+                  <div className="flex justify-center gap-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleDescriptionUpdate}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+                    >
+                      Save
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setDescription(user?.description || "");
+                        setIsEditingDescription(false);
+                      }}
+                      className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="view"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <p className="text-gray-700 mb-3">{description || "No description added yet."}</p>
                   <button
-                    onClick={handleDescriptionUpdate}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-900 transition-colors duration-300"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setDescription(user?.description || "");
-                      setIsEditingDescription(false);
-                    }}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-blue-600">About Me</h2>
-                  <button
-                    className="p-2.5 bg-blue-600 rounded-xl hover:rounded-3xl hover:bg-blue-800 transition-all duration-300 text-white"
                     onClick={() => setIsEditingDescription(true)}
+                    className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -194,21 +203,50 @@ export default function ProfileCard() {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
+                    Edit Bio
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Upload Buttons */}
+            <div className="mt-8">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="fileInput"
+              />
+              <label
+                htmlFor="fileInput"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition cursor-pointer"
+              >
+                Select Profile Picture
+              </label>
+              {file && !isUploaded && (
+                <div className="flex justify-center gap-4 mt-4">
+                  <button
+                    onClick={handleUpload}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+                  >
+                    Upload
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFile(null);
+                      setPreview(null);
+                    }}
+                    className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+                  >
+                    Cancel
                   </button>
                 </div>
-
-                <p className="text-gray-700 mb-2">{description || "No description yet."}</p>
-
-
-
-              </>
-            )}
-
-
-            {/* Skills Section */}
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

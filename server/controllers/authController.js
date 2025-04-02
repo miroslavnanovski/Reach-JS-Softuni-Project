@@ -21,14 +21,19 @@ authController.post(
     const { username, email, password } = req.body;
 
     try {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) return res.status(400).json({ message: "User already exists" });
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
 
+      const existingUsername = await User.findOne({ username });
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({ username, email, password: hashedPassword });
       await newUser.save();
-
 
       const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: "2h" });
 
@@ -43,11 +48,12 @@ authController.post(
       });
 
     } catch (error) {
-      console.error("Error in register:", error); // Log full error details
-    res.status(500).json({ message: "Server error", error: error.message });
+      console.error("Error in register:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
     }
   }
 );
+
 
 // User Login
 authController.post(

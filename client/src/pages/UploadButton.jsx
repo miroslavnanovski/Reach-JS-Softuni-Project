@@ -3,6 +3,7 @@ import decodeToken from "../utils/decodeToken";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useUser } from "../contexts/userContext";
 
 
 export default function UploadButton() {
@@ -15,9 +16,16 @@ export default function UploadButton() {
   const [progress, setProgress] = useState(0);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
 
+const {token} = useUser();
+const decoded = decodeToken(token);
+const userId = decoded?.userId || decoded?.id;
 
-  const { userId } = decodeToken();
+if (!userId) {
+  console.warn("No valid user ID found in token");
+  return null; // or show fallback UI
+}
   const navigate = useNavigate();
 
 
@@ -61,7 +69,7 @@ export default function UploadButton() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/photos/upload",
+       `${URL}/api/photos/upload`,
         formData,
         {
           headers: {

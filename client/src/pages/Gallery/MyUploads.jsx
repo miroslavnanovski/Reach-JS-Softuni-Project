@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../contexts/userContext";
 import Gallery from "./Gallery";
-import NoContent from "./NoContent";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 
 export default function UserGallery() {
@@ -11,10 +11,24 @@ export default function UserGallery() {
     const [photosCount, setPhotosCount] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const { user } = useUser();
+    const [favorites, setFavorites] = useState([]);
+
+    const URL = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
-        if (user) {
-            setUserId(user?._id);
+        if (user && user._id) {
+            setUserId(user._id); // optionally still set userId if used elsewhere
+
+            const fetchFavoritePhotos = async () => {
+                try {
+                    const res = await axios.get(`${URL}/api/user/${user._id}/favorites/`);
+                    setFavorites(res.data);
+                } catch (error) {
+                    console.error('Error fetching favorite photos:', error);
+                }
+            };
+
+            fetchFavoritePhotos();
         }
     }, [user]);
 
@@ -51,7 +65,7 @@ export default function UserGallery() {
                                 className="text-sm text-blue-600 hover:underline mt-1"
                             >
                                 <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
-                                    <span>⭐️</span>{user.favorites.length} favorite{user.favorites.length !== 1 ? 's' : ''}
+                                    <span>⭐️</span>{favorites.length} favorite{user.favorites.length !== 1 ? 's' : ''}
                                 </p>
                             </Link>
                         </div>
@@ -66,6 +80,19 @@ export default function UserGallery() {
 
             {/* Gallery Section */}
             <Gallery userId={userId} onPhotosCountChange={updatePhotosCount} />
+
+            {!isLoading && photosCount === 0 && (
+                <div className="text-center text-gray-500 mt-10">
+                    <p className="text-lg font-semibold">No uploads yet.</p>
+                    <p className="text-sm text-gray-400">Start by uploading your first photo!</p>
+                    <Link
+                        to="/upload"
+                        className="inline-block mt-4 px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                    >
+                        Upload a Photo
+                    </Link>
+                </div>
+            )}
         </>
     );
 }

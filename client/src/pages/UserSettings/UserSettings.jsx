@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react"
 import EmailInput from "./EmailInput";
 import axios from "axios";
-import useFetchUser from "../../utils/useFetchUser";
 import PasswordInput from "./PasswordInput";
 import { useUser } from "../../contexts/userContext";
+import ConfirmDeleteModal from "../Gallery/ConfirmDeleteModal";
+import { useNavigate } from "react-router-dom";
 
 export default function UserSettings() {
   const [isChangeOpen, setIsChangeOpen] = useState(false);
   const [email, setEmail] = useState('')
   const [emailDisplay, setEmailDisplay] = useState('')
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const token = localStorage.getItem('Authorization');
 
-  const { user } = useUser()
+  const { user, loginUser, logoutUser, token } = useUser()
+
+  const URL = import.meta.env.VITE_API_BASE_URL;
+
+
+
 
 
   useEffect(() => {
@@ -36,16 +43,16 @@ export default function UserSettings() {
       setError('Email field cannot be empty!');
       return;
     }
-
+  
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail);
     if (!isValidEmail) {
       setError('Please enter a valid email address.');
       return;
     }
-
+  
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/user/update-email`,
+        `${URL}/api/user/update-email`,
         { newEmail },
         {
           headers: {
@@ -53,16 +60,51 @@ export default function UserSettings() {
           },
         }
       );
-
+  
+      const { updatedUser, token: newToken } = response.data;
+  
+      // ✅ Update context with new token + user
+      loginUser({
+        user: updatedUser,
+        token: newToken,
+      });
+  
       setEmailDisplay(newEmail);
       setIsChangeOpen(false);
-      setError(""); // Clear error on success
-      console.log("API Response: success");
+      setError("");
+  
     } catch (error) {
       console.error("API Error:", error);
       setError("Failed to update email. Please try again.");
     }
   };
+
+  const handleUserDelete = async () => {
+    if (!user?._id) return;
+
+    try {
+      await axios.delete(
+        `${URL}/api/user/${user._id}/delete`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setEmailDisplay('');
+      setIsChangeOpen(false);
+      setError('');
+
+      logoutUser();
+      
+      navigate('/')
+    } catch (error) {
+      console.error('API Error:', error);
+      setError('Failed to delete user. Please try again.');
+    }
+  };
+
 
 
   return (
@@ -75,64 +117,48 @@ export default function UserSettings() {
         </div>
         <hr className="mt-4 mb-8" />
         <p className="py-2 text-xl font-semibold">Email Address</p>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
 
-          {isChangeOpen ? (
-            <EmailInput
-              onEmailChange={handleEmailChange}
-              error={error}
-              className="absolute"
-            />
-          ) : (
-            <p>Your email address is <strong>{emailDisplay}</strong></p>
-          )}
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+  <div>
+    {isChangeOpen ? (
+      <EmailInput onEmailChange={handleEmailChange} error={error} />
+    ) : (
+      <p>Your email address is <strong>{emailDisplay}</strong></p>
+    )}
+  </div>
 
+  <div className="flex gap-3">
+    {isChangeOpen ? (
+      <>
+        <button
+          onClick={() => handleSubmit(email)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Submit
+        </button>
+        <button
+          onClick={() => {
+            setError('');
+            setIsChangeOpen(false);
+          }}
+          className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
+        >
+          Cancel
+        </button>
+      </>
+    ) : (
+      <button
+        onClick={() => setIsChangeOpen(true)}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Change
+      </button>
+    )}
+  </div>
+</div>
 
-         
-
-
-          {isChangeOpen ?
-            <>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleSubmit(email)}
-                  className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-                  Submit
-                </button>
-
-                <button
-                  onClick={() => {
-                    setError('');
-                    setIsChangeOpen(!isChangeOpen);
-                  }}
-                  className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-                  Cancel
-                </button>
-              </div>
-            </>
-            :
-            <button
-              onClick={() =>
-                setIsChangeOpen(!isChangeOpen)
-              }
-              className="mt-2 px-4 py-2 bg-blue-600  text-white rounded-lg hover:bg-blue-700 transition">
-              Change
-            </button>
-          }
-        </div>
 
         <PasswordInput />
-
-        {/* <p className="mt-2">
-          Can't remember your current password.{" "}
-          <a
-            className="text-sm font-semibold text-blue-600 underline decoration-2"
-            href="#"
-          >
-            Recover Account
-          </a>
-        </p> */}
-
 
 
         <hr className="mt-4 mb-8" />
@@ -158,9 +184,21 @@ export default function UserSettings() {
             to get access to your data. We will completely wipe your data. There
             is no way to access your account after this action.
           </p>
-          <button className="ml-auto text-sm font-semibold text-rose-600 underline decoration-2">
-            Continue with deletion
+          <button
+            className="ml-auto mt-4 px-4 py-2 text-sm font-semibold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition duration-200"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Delete Account
           </button>
+          <ConfirmDeleteModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onDelete={handleUserDelete}
+            title="Are you sure you want to delete your account?"
+            description="This action cannot be undone. All your data will be lost."
+            confirmText="Yes, delete my account"
+            cancelText="Cancel"
+          />
         </div>
       </div>
     </div>

@@ -210,6 +210,46 @@ photoController.get('/search', async (req, res) => {
 });
 
 
+// DELETE comment
+photoController.delete("/:photoId/comments/:commentId", Auth, async (req, res) => {
+  const { photoId, commentId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    const photo = await Photo.findById(photoId);
+    if (!photo) {
+      return res.status(404).json({ message: "Photo not found" });
+    }
+
+    const comment = photo.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    if (comment.user.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // 🔧 Remove manually
+    photo.comments = photo.comments.filter(
+      (c) => c._id.toString() !== commentId
+    );
+
+    await photo.save();
+
+    return res.status(200).json({
+      message: "Comment deleted successfully",
+      comments: photo.comments,
+    });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+
 
 
 

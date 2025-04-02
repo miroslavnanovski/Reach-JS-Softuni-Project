@@ -1,15 +1,14 @@
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 
-export default function decodeToken() {
-    const token = localStorage.getItem('Authorization');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        return decoded; 
-      } catch (error) {
-        console.error('Token decode error:', error);
-        return null;
-      }
-    }
+export default function decodeToken(token) {
+  if (!token || typeof token !== "string" || !token.includes(".")) {
+    return null; // 
+  }
+
+  try {
+    return jwtDecode(token);
+  } catch (error) {
+    console.error("Token decode error:", error);
     return null;
   }
+}

@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import Auth from "../middlewares/auth-middleware.js";
 import { upload } from "../middlewares/cloudinary-middleware.js";
 import Photo from "../models/Photo.js";
+import jwt from "jsonwebtoken";
+
 
 const userController = express.Router();
 
@@ -17,19 +19,34 @@ userController.post("/update-email", Auth, async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Check if the email is already in use
+  
     const emailExists = await User.findOne({ email: newEmail });
     if (emailExists) return res.status(400).json({ message: "Email already in use" });
-
-    // Update email
+  
     user.email = newEmail;
     await user.save();
-
-    res.json({ message: "Email updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+  
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    )
+  
+    res.json({
+      updatedUser: {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+        profilePicture: user.profilePicture,
+        favorites: user.favorites,
+      },
+      token,
+    });
+  }catch (error) {
+    console.error("Update email error:", error);
+    res.status(500).json({ message: "Something went wrong." });
   }
+  
 });
 
 userController.get('/count', async (req, res) => {
@@ -142,6 +159,25 @@ userController.get('/:userId/favorites', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+userController.delete('/:userId/delete', Auth, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const result = await User.findByIdAndDelete(userId);
+
+    if (result) {
+      console.log('User deleted successfully');
+      res.status(200).json({ message: 'User deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error deleting user' });
+  }
+});
+
+
 
 
 

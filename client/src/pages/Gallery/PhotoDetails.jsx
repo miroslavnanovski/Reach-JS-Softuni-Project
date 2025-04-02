@@ -6,9 +6,10 @@ import useFetchSingle from "../../utils/useFetchSinglePhoto";
 import useFetchUserById from "../../hooks/useFetchUserById";
 import { useUser } from "../../contexts/userContext";
 import axios from "axios";
-import DeletePhotoModal from "./DeletePhotoModal";
 import ResponsiveImage from "./ResponsiveImage";
 import { X } from 'lucide-react';
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import toast from "react-hot-toast";
 
 
 
@@ -20,6 +21,9 @@ function PhotoDetail() {
   const { user } = useFetchUserById(photo?.user);
   const { user: loggedInUser, token } = useUser();
   const [localUser, setLocalUser] = useState(loggedInUser);
+  const [isDeleted, setIsDeleted] = useState(false);
+ 
+
 
 
 
@@ -47,22 +51,68 @@ function PhotoDetail() {
   const handleDelete = async (photoId) => {
     if (!photoId) return;
 
+    const URL = import.meta.env.VITE_API_BASE_URL;
+
+    const toastId = toast.loading("Deleting photo...");
+
     try {
-      await axios.delete(`http://localhost:3000/api/photos/${photoId}/delete`, {
+      await axios.delete(`${URL}/api/photos/${photoId}/delete`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      navigate('/user-gallery');
+      // Show loading toast for a moment before success
+      setTimeout(() => {
+        toast.success("Photo deleted successfully!", { id: toastId });
+
+        // Then navigate after a short delay
+        setTimeout(() => {
+          navigate("/gallery");
+        }, 600); // optional: tweak this for extra display time
+      }, 800); // <- delay before showing success
     } catch (error) {
-      console.error(`Cannot delete photo: ${error.message}`);
+      toast.error("Failed to delete photo", { id: toastId });
     }
   };
 
 
-  if (isLoading) return <p>Loading photo...</p>;
-  if (!photo) return <p>Photo not found.</p>;
+
+
+
+
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-600">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500 mb-3"></div>
+        <p className="text-lg font-medium">Loading photo...</p>
+      </div>
+    );
+  }
+
+  if (!photo) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-500">
+        <svg
+          className="w-12 h-12 mb-2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+        <p className="text-lg font-medium">Photo not found</p>
+        <p className="text-sm text-gray-400">It may have been removed or the link is incorrect.</p>
+      </div>
+    );
+  }
+
 
 
 
@@ -96,29 +146,32 @@ function PhotoDetail() {
 
 
 
-                      <DeletePhotoModal
+                      <ConfirmDeleteModal
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
                         onDelete={() => handleDelete(photoId)}
+                        title="Are you sure you want to delete this photo?"
+                        description="This action cannot be undone. The photo will be permanently removed."
                       />
                     </>
                   )}
 
                 </h1>
 
-                <ResponsiveImage
-                  src={photo.imageUrl}
-                  alt={photo.caption}
-                  photo={photo}
-                  photoId={photoId}
-                  token={token}
-                  currentUserId={localUser?._id}
-                  onPhotoUpdate={setPhoto}
-                  onUserUpdate={setLocalUser}
-                  favorites={localUser?.favorites || []}
-                />
+              
 
-
+                  <ResponsiveImage
+                    src={photo.imageUrl}
+                    alt={photo.caption}
+                    photo={photo}
+                    photoId={photoId}
+                    token={token}
+                    currentUserId={localUser?._id}
+                    onPhotoUpdate={setPhoto}
+                    onUserUpdate={setLocalUser}
+                    favorites={localUser?.favorites || []}
+                  />
+                
 
 
                 <div className="mt-10"></div>

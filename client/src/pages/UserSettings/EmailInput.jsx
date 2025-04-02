@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { motion,AnimatePresence  } from "framer-motion";
 
 export default function EmailInput({ onEmailChange, error }) {
     const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ export default function EmailInput({ onEmailChange, error }) {
     };
   
     return (
-      <div className="mb-6">
+      <div>
         <div className="relative">
           {/* Icon */}
           <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
@@ -40,12 +40,21 @@ export default function EmailInput({ onEmailChange, error }) {
           />
         </div>
   
-        {/* Error or spacer */}
-        {error ? (
-          <p className="text-red-500 text-sm mt-1 ps-2">{error}</p>
-        ) : (
-          <div className="h-5 mt-1" /> // spacer with same height as error message
-        )}
+        {/* Error with animation */}
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              key="email-error"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="text-red-500 text-sm ps-2 mt-1 overflow-hidden"
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     );
   }

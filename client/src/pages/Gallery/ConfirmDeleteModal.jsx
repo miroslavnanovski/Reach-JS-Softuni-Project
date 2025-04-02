@@ -1,11 +1,18 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
-const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
+const ConfirmDeleteModal = ({
+  isOpen,
+  onClose,
+  onDelete,
+  title = "Are you sure you want to delete this item?",
+  description = "This action cannot be undone.",
+  confirmText = "Delete",
+  cancelText = "Cancel",
+}) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        {/* Backdrop */}
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -18,7 +25,6 @@ const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
         </Transition.Child>
 
-        {/* Modal Panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Transition.Child
             as={Fragment}
@@ -30,7 +36,6 @@ const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
             leaveTo="opacity-0 scale-95 translate-y-4"
           >
             <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl bg-white p-6 text-center shadow-xl transition-all">
-              {/* Close Button */}
               <div className="flex justify-end">
                 <button
                   onClick={onClose}
@@ -41,7 +46,6 @@ const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
                 </button>
               </div>
 
-              {/* Icon */}
               <div className="flex justify-center mb-4">
                 <svg
                   className="w-12 h-12 text-red-500"
@@ -58,29 +62,23 @@ const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
                 </svg>
               </div>
 
-              {/* Title */}
               <Dialog.Title className="text-xl font-semibold text-gray-800 mb-2">
-                Are you sure you want to delete this photo?
+                {title}
               </Dialog.Title>
+              <p className="text-sm text-gray-500 mb-6">{description}</p>
 
-              {/* Description */}
-              <p className="text-sm text-gray-500 mb-6">
-                This action cannot be undone. The photo will be permanently removed.
-              </p>
-
-              {/* Actions */}
               <div className="flex flex-col gap-3">
                 <button
                   onClick={onDelete}
                   className="bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition"
                 >
-                  Delete
+                  {confirmText}
                 </button>
                 <button
                   onClick={onClose}
                   className="bg-gray-100 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-200 transition"
                 >
-                  Cancel
+                  {cancelText}
                 </button>
               </div>
             </Dialog.Panel>
@@ -91,4 +89,5 @@ const DeletePhotoModal = ({ isOpen, onClose, onDelete }) => {
   );
 };
 
-export default DeletePhotoModal;
+export default ConfirmDeleteModal;
+

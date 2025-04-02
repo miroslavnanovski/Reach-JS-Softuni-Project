@@ -15,8 +15,12 @@ export default function ResponsiveImage({
 
   const [isVertical, setIsVertical] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+
+  const isMobile = window.innerWidth < 768;
 
 
+  const URL = import.meta.env.VITE_API_BASE_URL;
 
   // Detect orientation
   const handleImageLoad = (e) => {
@@ -36,7 +40,7 @@ export default function ResponsiveImage({
   const toggleLike = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/photos/${photoId}/like`,
+        `${URL}/api/photos/${photoId}/like`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -55,7 +59,7 @@ export default function ResponsiveImage({
   const toggleFavorite = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/photos/${photoId}/favorite`,
+        `${URL}/api/photos/${photoId}/favorite`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -77,7 +81,15 @@ export default function ResponsiveImage({
       className={`mx-auto rounded-md overflow-hidden ${isVertical ? "w-auto" : "w-full"
         } flex justify-center`}
     >
-      <div className="relative group">
+      <div
+        className="relative group"
+        onClick={() => {
+          if (isMobile) setShowActions(!showActions);
+        }}
+        onMouseEnter={() => !isMobile && setShowActions(true)}
+        onMouseLeave={() => !isMobile && setShowActions(false)}
+      >
+
         <img
           src={src}
           alt={alt}
@@ -92,18 +104,20 @@ export default function ResponsiveImage({
             {/* Favorite Icon - Top Right */}
             <button
               onClick={toggleFavorite}
-              className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 hover:scale-110"
+              className={`absolute top-2 right-2 bg-white rounded-full p-2 shadow-md transition-all duration-300 z-20 hover:scale-110 ${showActions ? "opacity-100" : "opacity-0"}`}
+
             >
               {favorites.includes(photoId) ? (
                 <Star className="w-5 h-5 fill-current text-yellow-400 stroke-yellow-400" />
               ) : (
-                <Star  className="w-5 h-5 fill-white stroke-yellow-400" />
+                <Star className="w-5 h-5 fill-white stroke-yellow-400" />
               )}
             </button>
 
             <button
               onClick={toggleLike}
-              className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 hover:scale-110"
+              className={`absolute top-2 left-2 bg-white rounded-full p-2 shadow-md transition-all duration-300 z-20 hover:scale-110 ${showActions ? "opacity-100" : "opacity-0"}`}
+
 
             >
               {liked ? (
