@@ -17,12 +17,15 @@ import RouteGuard from "./utils/routeGuard";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./components/NotFound";
 import Upload from "./components/UploadSection/Upload";
+import { useEffect } from "react";
+
 
 function App() {
   const loginModalOpen = useUIStore((state) => state.loginModalOpen);
   const setLoginModalOpen = useUIStore((state) => state.setLoginModalOpen);
   const showSignupByDefault = useUIStore((state) => state.showSignupByDefault);
   const { loading } = useUser();
+
 
   if (loading) {
     return (

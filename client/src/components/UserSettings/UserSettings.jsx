@@ -35,7 +35,7 @@ export default function UserSettings() {
       setEmail(user.email);
     }
   }, [isChangeOpen, user]);
-  
+
 
 
 
@@ -49,13 +49,13 @@ export default function UserSettings() {
       setError('Email field cannot be empty!');
       return;
     }
-  
+
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail);
     if (!isValidEmail) {
       setError('Please enter a valid email address.');
       return;
     }
-  
+
     try {
       const response = await axios.post(
         `${URL}/api/user/update-email`,
@@ -66,53 +66,53 @@ export default function UserSettings() {
           },
         }
       );
-  
+
       const { updatedUser, token: newToken } = response.data;
-  
+
       //  Update context with new token + user
       loginUser({
         user: updatedUser,
         token: newToken,
       });
-  
+
       setEmailDisplay(newEmail);
       setIsChangeOpen(false);
       setError("");
       toast.success('Email changed successfully!')
-  
+
     } catch (error) {
 
       console.error("API Error:", error);
-      
+
       const message = error?.response?.data?.message || "Failed to update email. Please try again.";
       setError(message);
-      
+
     }
   };
 
   const handleUserDelete = async () => {
     if (!user?._id) return;
-
+  
     try {
-      await axios.delete(
-        `${URL}/api/user/${user._id}/delete`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setEmailDisplay('');
-      setIsChangeOpen(false);
-      setError('');
-
+      const toastId = toast.loading("Deleting your account...");
+  
+      await axios.delete(`${URL}/api/user/${user._id}/delete`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      toast.success("Account deleted successfully", { id: toastId });
+  
+      //  Prevent modal on logout
+      sessionStorage.setItem("skipLoginModal", "true");
+  
       logoutUser();
+      navigate("/");
       
-      navigate('/')
     } catch (error) {
-      console.error('API Error:', error);
-      setError('Failed to delete user. Please try again.');
+      console.error("API Error:", error);
+      setError("Failed to delete user. Please try again.");
     }
   };
 
@@ -129,44 +129,44 @@ export default function UserSettings() {
         <hr className="mt-4 mb-8" />
         <p className="py-2 text-xl font-semibold">Email Address</p>
 
-<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
-  <div>
-    {isChangeOpen ? (
-      <EmailInput onEmailChange={handleEmailChange} error={error} />
-    ) : (
-      <p>Your email address is <strong>{emailDisplay}</strong></p>
-    )}
-  </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+          <div>
+            {isChangeOpen ? (
+              <EmailInput onEmailChange={handleEmailChange} error={error} />
+            ) : (
+              <p>Your email address is <strong>{emailDisplay}</strong></p>
+            )}
+          </div>
 
-  <div className="flex gap-3">
-    {isChangeOpen ? (
-      <>
-        <button
-          onClick={() => handleSubmit(email)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Submit
-        </button>
-        <button
-          onClick={() => {
-            setError('');
-            setIsChangeOpen(false);
-          }}
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
-        >
-          Cancel
-        </button>
-      </>
-    ) : (
-      <button
-        onClick={() => setIsChangeOpen(true)}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-      >
-        Change
-      </button>
-    )}
-  </div>
-</div>
+          <div className="flex gap-3">
+            {isChangeOpen ? (
+              <>
+                <button
+                  onClick={() => handleSubmit(email)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setError('');
+                    setIsChangeOpen(false);
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsChangeOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Change
+              </button>
+            )}
+          </div>
+        </div>
 
 
         <PasswordInput />

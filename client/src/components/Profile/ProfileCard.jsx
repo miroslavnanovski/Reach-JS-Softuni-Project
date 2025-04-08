@@ -15,7 +15,7 @@ export default function ProfileCard() {
   const [number, setNumber] = useState(0);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const { user, token } = useUser();
+  const { user, token, setUser } = useUser();
   const [description, setDescription] = useState(user?.description || "");
 
   const photosCount = 5;
@@ -30,7 +30,8 @@ export default function ProfileCard() {
     uploadMessage,
     uploadStatus,
     progress,
-    uploadPhoto
+    uploadPhoto,
+    resetUpload
   } = useUpload(token);
 
   useEffect(() => {
@@ -72,26 +73,36 @@ export default function ProfileCard() {
   const handleUpload = async () => {
     if (!file) return toast.error("Please select an image first!");
     if (!token) return toast.error("You are not authenticated!");
-  
+
+    resetUpload();
     setShowModal(true);
-  
+
     const result = await uploadPhoto({
       file,
       token,
       endpoint: "/api/user/profile-picture",
       method: "PUT",
     });
-    
-  
+
+
     if (result.success) {
       toast.success("Profile picture updated successfully!");
       setIsUploaded(true);
+      
+
+      setUser((prev) => {
+        const updatedUser = {
+          ...prev,
+          profilePicture: result.data.profilePicture,
+        };
+        return updatedUser;
+      });
     } else {
       toast.error("Upload failed");
     }
   };
-  
-  
+
+
 
   const handleDescriptionUpdate = async () => {
     if (!token) return toast.error("You are not authenticated!");
@@ -119,6 +130,13 @@ export default function ProfileCard() {
       toast.error("An error occurred. Try again.");
     }
   };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setFile(null);
+    setPreview(null);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center px-4 py-10">
@@ -236,33 +254,36 @@ export default function ProfileCard() {
               </label>
               {file && !isUploaded && (
                 <>
-                <div className="flex justify-center gap-4 mt-4">
-                  <button
-                    onClick={handleUpload}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
-                  >
-                    Upload
-                  </button>
-                  <button
-                    onClick={() => {
-                      setFile(null);
-                      setPreview(null);
-                    }}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button
+                      onClick={handleUpload}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+                    >
+                      Upload
+                    </button>
+                    <button
+                      onClick={() => {
+                        setFile(null);
+                        setPreview(null);
+                      }}
+                      className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
 
-                 <UploadModal
-                        show={showModal}
-                        isUploading={isUploading}
-                        progress={progress}
-                        uploadStatus={uploadStatus}
-                        uploadMessage={uploadMessage}
-                      />
-                      </>
+
+                </>
               )}
+
+              <UploadModal
+                show={showModal}
+                isUploading={isUploading}
+                progress={progress}
+                uploadStatus={uploadStatus}
+                uploadMessage={uploadMessage}
+                onClose={closeModal}
+              />
             </div>
           </div>
         </div>

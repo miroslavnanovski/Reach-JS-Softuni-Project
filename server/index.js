@@ -51,6 +51,13 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+app.use((req, res) => {
+  console.log(`Unhandled request: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ message: "Not Found" });
+});
+
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

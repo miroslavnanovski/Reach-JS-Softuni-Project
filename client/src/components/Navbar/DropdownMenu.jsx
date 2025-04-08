@@ -19,6 +19,8 @@ export default function DropdownMenu() {
   const handleLogout = () => {
     setIsOpen(false);
     const toastId = toast.loading("Signing out...");
+
+    sessionStorage.setItem("skipLoginModal", "true");
   
     setTimeout(() => {
       logoutUser();

@@ -18,6 +18,7 @@ const UserProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("Authorization") || null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   // Load user on mount
   useEffect(() => {
@@ -25,6 +26,8 @@ const UserProvider = ({ children }) => {
       if (!token) {
         setUser(null);
         setLoading(false);
+        setInitialized(true);
+
         return;
       }
 
@@ -52,6 +55,7 @@ const UserProvider = ({ children }) => {
         setUser(null);
       } finally {
         setLoading(false);
+        setInitialized(true);
       }
     };
 
@@ -95,7 +99,7 @@ const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, token, loginUser, logoutUser, loading }}>
+    <UserContext.Provider value={{ user, token, loginUser, logoutUser, loading, setUser, initialized }}>
       {children}
     </UserContext.Provider>
   );

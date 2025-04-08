@@ -48,18 +48,21 @@ const AuthModal = ({ isOpen, onClose, initialState = true }) => {
   
       if (isSignUp) {
         const toastId = toast.loading("Creating account...");
-        const response = await register(formData.username, formData.email, formData.password);
-        toast.dismiss(toastId);
-        toast.success("Account created successfully!");
+        try {
+          const response = await register(formData.username, formData.email, formData.password);
   
-        if (!response || !response.token || !response.user) {
-          throw new Error("Invalid response from register");
+          if (!response || !response.token || !response.user) {
+            throw new Error("Invalid response from register");
+          }
+  
+          toast.dismiss(toastId);
+          toast.success("Account created successfully!");
+          data = response;
+          await new Promise((res) => setTimeout(res, 500));
+        } catch (err) {
+          toast.dismiss(toastId);
+          throw err;
         }
-  
-        data = response;
-  
-        // 🔄 Pause before logging in for effect
-        await new Promise((resolve) => setTimeout(resolve, 800));
       } else {
         const response = await login(formData.email, formData.password);
         if (!response || !response.token || !response.user) {

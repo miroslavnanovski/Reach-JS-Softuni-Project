@@ -9,6 +9,13 @@ const useUpload = () => {
 
   const URL = import.meta.env.VITE_API_BASE_URL;
 
+  const resetUpload = () => {
+    setIsUploading(false);
+    setUploadMessage("");
+    setUploadStatus("");
+    setProgress(0);
+  };
+
   const uploadPhoto = async ({ file, title = "", caption = "", token, endpoint, method = "POST" }) => {
     setIsUploading(true);
     setUploadMessage("Uploading...");
@@ -55,6 +62,7 @@ const useUpload = () => {
     uploadStatus,
     progress,
     uploadPhoto,
+    resetUpload
   };
 };
 
