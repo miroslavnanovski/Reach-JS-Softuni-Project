@@ -66,7 +66,7 @@ export default function Gallery({ userId,onPhotosCountChange }) {
         <div className="gallery-container max-w-screen-2xl mx-auto p-6">
             <Masonry  
             breakpointCols={breakpointColumns}
-            className="flex gap-4" // Horizontal gap
+            className="flex gap-4" 
             columnClassName="masonry-column">
             
             {photos.map((photo) => (

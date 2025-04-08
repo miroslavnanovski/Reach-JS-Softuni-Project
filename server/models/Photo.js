@@ -4,6 +4,10 @@ const photoSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     imageUrl: { type: String, required: true },
     caption: { type: String },
+    title: {
+      type: String,
+      required: true,
+    },
     metadata: {
       size:Number,
       format:String,

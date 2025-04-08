@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useFetchMultiplePhotos from "../../hooks/useFetchMultiplePhotos";
 import axios from "axios";
-import SearchModal from "./SearchModal";
+import SearchModal from "./Modals/SearchModal";
 import { motion } from "framer-motion";
 
 export default function SearchBarComponent({ onSearch }) {

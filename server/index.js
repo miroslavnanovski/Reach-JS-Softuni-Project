@@ -7,15 +7,13 @@ import authController from "./controllers/authController.js";
 import userController from "./controllers/userController.js";
 import logCRUDOperations from "./middlewares/log-middleware.js";
 
-// Load environment variables
 dotenv.config();
 
-// Use Mongoose for MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
 
 const allowedOrigins = [
   "https://my-test-project-25338.web.app",
-  "http://localhost:5173" // for local dev
+  "http://localhost:5173",
 ];
 
 async function connectDB() {
@@ -30,21 +28,22 @@ async function connectDB() {
   }
 }
 
-
 connectDB();
 
 const app = express();
-app.use(express.json());
+
 app.use(logCRUDOperations);
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
 }));
 
-// API Routes
-app.use("/api/photos", photoRoutes);
-app.use("/api/auth", authController);
-app.use("/api/user", userController);
+// ✅ For JSON-based photo routes like PUT /:photoId
+app.use("/api/photos", express.json(), photoRoutes); 
+
+// ✅ For auth and user management
+app.use("/api/auth", express.json(), authController);
+app.use("/api/user", express.json(), userController);
 
 // Simple test route
 app.get("/", (req, res) => {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 
 export default function PasswordInput() {
@@ -57,6 +58,7 @@ export default function PasswordInput() {
  
 
       if (response.data.message === 'Password updated successfully') {
+        toast.success("Password changed successfully.")
         setSuccessMessage("Password changed successfully.");
         setError(""); // Clear any previous error messages
         setCurrentPassword("");

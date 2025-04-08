@@ -1,21 +1,22 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Upload from "./pages/Upload";
-import Gallery from "./pages/Gallery/Gallery";
-import PhotoDetail from "./pages/Gallery/PhotoDetails";
+import Home from "./components/Home";
+
+import Gallery from "./components/Gallery/Gallery";
+import PhotoDetail from "./components/Gallery/PhotoDetails";
 import Navbar from "./components/Navbar/Navbar";
-import UserSettings from "./pages/UserSettings/UserSettings";
-import ProfileCard from "./pages/Profile/ProfileCard";
-import AboutPage from "./pages/About";
-import UserGallery from "./pages/Gallery/MyUploads";
-import FavoritesGallery from "./pages/Gallery/FavoritesGallery";
+import UserSettings from "./components/UserSettings/UserSettings";
+import ProfileCard from "./components/Profile/ProfileCard";
+import AboutPage from "./components/About";
+import UserGallery from "./components/Gallery/MyUploads";
+import FavoritesGallery from "./components/Gallery/FavoritesGallery";
 import { useUser } from "./contexts/userContext";
 import { useUIStore } from "./stores/uiStore";
 import AuthModal from "./components/Navbar/authModal";
 import RouteGuard from "./utils/routeGuard";
 import { Toaster } from "react-hot-toast";
-import NotFound from "./pages/NotFound";
+import NotFound from "./components/NotFound";
+import Upload from "./components/UploadSection/Upload";
 
 function App() {
   const loginModalOpen = useUIStore((state) => state.loginModalOpen);

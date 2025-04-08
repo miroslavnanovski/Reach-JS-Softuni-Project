@@ -1,15 +1,17 @@
 // PhotoDetail.js
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import CommentsSection from "../../components/comments-section/CommentsSection";
+import CommentsSection from "../comments-section/CommentsSection";
 import useFetchSingle from "../../utils/useFetchSinglePhoto";
 import useFetchUserById from "../../hooks/useFetchUserById";
 import { useUser } from "../../contexts/userContext";
 import axios from "axios";
 import ResponsiveImage from "./ResponsiveImage";
-import { X } from 'lucide-react';
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { X, Pencil } from 'lucide-react';
+import ConfirmDeleteModal from "./Modals/ConfirmDeleteModal";
 import toast from "react-hot-toast";
+import EditModal from "./Modals/EditModal";
+import { motion,AnimatePresence } from "framer-motion";
 
 
 
@@ -22,19 +24,25 @@ function PhotoDetail() {
   const { user: loggedInUser, token } = useUser();
   const [localUser, setLocalUser] = useState(loggedInUser);
   const [isDeleted, setIsDeleted] = useState(false);
- 
-
-
-
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTitle, setEditTitle] = useState(photo.title);
+  const [editCaption, setEditCaption] = useState(photo.caption);
 
 
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+    if (photo) {
+      setEditTitle(photo.title);
+      setEditCaption(photo.caption);
+    }
+  }, [photo]);
+
+
   useEffect(() => {
     setLocalUser(loggedInUser);
   }, [loggedInUser]);
-
-
 
 
   useEffect(() => {
@@ -62,20 +70,47 @@ function PhotoDetail() {
         },
       });
 
-      // Show loading toast for a moment before success
+      
       setTimeout(() => {
         toast.success("Photo deleted successfully!", { id: toastId });
 
-        // Then navigate after a short delay
+        
         setTimeout(() => {
           navigate("/gallery");
-        }, 600); // optional: tweak this for extra display time
-      }, 800); // <- delay before showing success
+        }, 600); 
+      }, 800); 
     } catch (error) {
       toast.error("Failed to delete photo", { id: toastId });
     }
   };
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/api/photos/${photo._id}`,
+        {
+          title: editTitle,
+          caption: editCaption,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", 
+          },
+        }
+      );
+
+      toast.success("Photo updated!");
+      setShowEditModal(false);
+
+      
+      photo.title = editTitle;
+      photo.caption = editCaption;
+    } catch (err) {
+      toast.error("Failed to update photo");
+    }
+  };
 
 
 
@@ -113,6 +148,12 @@ function PhotoDetail() {
     );
   }
 
+  const openEditModal = () => {
+    setEditTitle(photo.title);
+    setEditCaption(photo.caption);
+    setShowEditModal(true);
+  };
+
 
 
 
@@ -130,21 +171,42 @@ function PhotoDetail() {
             <div className="flex flex-col md:flex-row">
 
               {/* Left Column: Photo & Description */}
-              <div className="w-full md:w-3/4 p-6 border-b border-gray-200">
+              <div className="w-full md:w-3/4 p-6 border-b ju border-gray-200">
 
-                <h1 className="text-2xl font-bold mb-4 flex justify-between items-center">
-                  <span>{photo.caption}</span>
+                <div className="mb-4 flex justify-between items-start">
+                  <h1 className="text-2xl font-bold">{photo.title}</h1>
 
-                  {/* X Button in the top-right corner */}
                   {isOwner && (
-                    <>
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        whileHover={{ scale: 1.25, rotate: -5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <Pencil
+                          onClick={openEditModal}
+                          className="w-5 h-5 text-blue-600 cursor-pointer"
+                        />
+                      </motion.div>
 
                       <X
                         onClick={() => setIsModalOpen(true)}
-                        className="cursor-pointer transition-transform duration-200 hover:rotate-90 hover:scale-110 hover:text-red-600"
+                        className="w-5 h-5 text-red-500 cursor-pointer transition-transform duration-200 hover:rotate-90 hover:scale-110"
                       />
 
-
+                      {/* Modals */}
+                      <AnimatePresence>
+                      {showEditModal && (
+                        <EditModal
+                          setShowEditModal={setShowEditModal}
+                          handleEditSubmit={handleEditSubmit}
+                          editTitle={editTitle}
+                          setEditTitle={setEditTitle}
+                          editCaption={editCaption}
+                          setEditCaption={setEditCaption}
+                          imageUrl={photo.imageUrl}
+                        />
+                      )}
+                      </AnimatePresence>
 
                       <ConfirmDeleteModal
                         isOpen={isModalOpen}
@@ -153,25 +215,25 @@ function PhotoDetail() {
                         title="Are you sure you want to delete this photo?"
                         description="This action cannot be undone. The photo will be permanently removed."
                       />
-                    </>
+                    </div>
                   )}
+                </div>
 
-                </h1>
 
-              
 
-                  <ResponsiveImage
-                    src={photo.imageUrl}
-                    alt={photo.caption}
-                    photo={photo}
-                    photoId={photoId}
-                    token={token}
-                    currentUserId={localUser?._id}
-                    onPhotoUpdate={setPhoto}
-                    onUserUpdate={setLocalUser}
-                    favorites={localUser?.favorites || []}
-                  />
-                
+                <ResponsiveImage
+                  src={photo.imageUrl}
+                  alt={photo.caption}
+                  photo={photo}
+                  photoId={photoId}
+                  token={token}
+                  currentUserId={localUser?._id}
+                  onPhotoUpdate={setPhoto}
+                  onUserUpdate={setLocalUser}
+                  favorites={localUser?.favorites || []}
+                  isOwner={isOwner}
+                />
+
 
 
                 <div className="mt-10"></div>

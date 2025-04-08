@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../contexts/userContext";
 import useFetchMultiplePhotos from "../../hooks/useFetchMultiplePhotos";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from 'react-hot-toast';
+import useUpload from "../../hooks/useUpload";
+import UploadModal from "../Gallery/Modals/UploadModal";
+
 
 
 export default function ProfileCard() {
+  const [showModal, setShowModal] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [number, setNumber] = useState(0);
@@ -20,6 +25,14 @@ export default function ProfileCard() {
 
   const URL = import.meta.env.VITE_API_BASE_URL;
 
+  const {
+    isUploading,
+    uploadMessage,
+    uploadStatus,
+    progress,
+    uploadPhoto
+  } = useUpload(token);
+
   useEffect(() => {
     if (photos.length > 0) {
       const randomNumber = Math.floor(Math.random() * photos.length);
@@ -33,7 +46,7 @@ export default function ProfileCard() {
     }
   }, [user]);
 
-  // ✅ Preview logic with cleanup
+
   useEffect(() => {
     if (!file) {
       setPreview(null);
@@ -46,6 +59,8 @@ export default function ProfileCard() {
     return () => window.URL.revokeObjectURL(objectUrl);
   }, [file]);
 
+
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -55,36 +70,31 @@ export default function ProfileCard() {
   };
 
   const handleUpload = async () => {
-    if (!file) return alert("Please select an image first!");
-    if (!token) return alert("You are not authenticated!");
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const response = await fetch(`${URL}/api/user/profile-picture`, {
-        method: "PUT",
-        body: formData,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Profile picture updated successfully!");
-        setPreview(data.profilePicture);
-        setIsUploaded(true);
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Upload failed. Try again.");
+    if (!file) return toast.error("Please select an image first!");
+    if (!token) return toast.error("You are not authenticated!");
+  
+    setShowModal(true);
+  
+    const result = await uploadPhoto({
+      file,
+      token,
+      endpoint: "/api/user/profile-picture",
+      method: "PUT",
+    });
+    
+  
+    if (result.success) {
+      toast.success("Profile picture updated successfully!");
+      setIsUploaded(true);
+    } else {
+      toast.error("Upload failed");
     }
   };
+  
+  
 
   const handleDescriptionUpdate = async () => {
-    if (!token) return alert("You are not authenticated!");
+    if (!token) return toast.error("You are not authenticated!");
 
     try {
       const response = await fetch(`${URL}/api/user/description`, {
@@ -99,14 +109,14 @@ export default function ProfileCard() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Description updated successfully!");
+        toast.success("Description updated successfully!");
         setIsEditingDescription(false);
       } else {
-        alert(data.message || "Failed to update description");
+        toast.error(data.message || "Failed to update description");
       }
     } catch (error) {
       console.error("Description update error:", error);
-      alert("An error occurred. Try again.");
+      toast.error("An error occurred. Try again.");
     }
   };
 
@@ -225,6 +235,7 @@ export default function ProfileCard() {
                 Select Profile Picture
               </label>
               {file && !isUploaded && (
+                <>
                 <div className="flex justify-center gap-4 mt-4">
                   <button
                     onClick={handleUpload}
@@ -242,6 +253,15 @@ export default function ProfileCard() {
                     Cancel
                   </button>
                 </div>
+
+                 <UploadModal
+                        show={showModal}
+                        isUploading={isUploading}
+                        progress={progress}
+                        uploadStatus={uploadStatus}
+                        uploadMessage={uploadMessage}
+                      />
+                      </>
               )}
             </div>
           </div>

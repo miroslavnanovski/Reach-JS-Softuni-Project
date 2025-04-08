@@ -8,27 +8,36 @@ const photoController = express.Router();
 
 // Upload a photo to Cloudinary
 photoController.post("/upload", Auth, upload.single("image"), async (req, res) => {
+
+  console.log("🧾 req.file:", req.file);
+console.log("📝 req.body:", req.body);
+
+
   try {
-      
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const { caption, userId } = req.body;
+    const { title, caption } = req.body;
     const imageUrl = req.file.path; // Cloudinary URL
 
-    // Metadata available from Multer (size, format, etc.)
+    // Validate required fields
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: "Title is required." });
+    }
+
     const metadata = {
-      size: req.file.size, // File size in bytes
-      format: req.file.mimetype, // image/jpeg, image/png, etc.
-      originalname: req.file.originalname, // Original file name
+      size: req.file.size,
+      format: req.file.mimetype,
+      originalname: req.file.originalname,
     };
 
     const newPhoto = new Photo({
-      user: userId,
-      imageUrl, // Use the correct Cloudinary URL
+      user: req.user.userId, // ✅ secure: use userId from token
+      imageUrl,
+      title,
       caption,
-      metadata, // Store metadata in the database
+      metadata,
     });
 
     await newPhoto.save();
@@ -39,6 +48,7 @@ photoController.post("/upload", Auth, upload.single("image"), async (req, res) =
     res.status(500).json({ message: "Upload failed", error: error.message });
   }
 });
+
 
 
 // Get all photos
@@ -246,6 +256,35 @@ photoController.delete("/:photoId/comments/:commentId", Auth, async (req, res) =
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+photoController.put("/:photoId", Auth, async (req, res) => {
+  console.log("Incoming update:", req.body);
+  console.log("Token user:", req.user);
+
+  try {
+    const photo = await Photo.findById(req.params.photoId);
+    if (!photo) {
+      return res.status(404).json({ message: "Photo not found" });
+    }
+
+    if (photo.user.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    photo.title = req.body.title || photo.title;
+    photo.caption = req.body.caption || photo.caption;
+
+    await photo.save();
+
+    res.status(200).json(photo);
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
+
 
 
 

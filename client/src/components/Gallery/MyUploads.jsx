@@ -41,7 +41,7 @@ export default function UserGallery() {
 
     return (
         <>
-            {/* Enhanced Top Section */}
+            {/* Top Section */}
             <div className="bg-white shadow-sm rounded-xl px-6 py-6 mb-6 mt-6 mx-4 sm:mx-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     {/* Left: Avatar & Info */}
@@ -51,7 +51,7 @@ export default function UserGallery() {
                                 whileHover={{ scale: 1.1, rotate: 1 }}
                                 whileTap={{ scale: 0.95 }}
                                 transition={{ type: "spring", stiffness: 300 }}
-                                src={user.profilePicture}
+                                src={user.profilePicture || "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="}
                                 alt="User Avatar"
                                 className="w-14 h-14 rounded-full object-cover shadow-md"
                             />
@@ -65,7 +65,11 @@ export default function UserGallery() {
                                 className="text-sm text-blue-600 hover:underline mt-1"
                             >
                                 <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
-                                    <span>⭐️</span>{favorites.length} favorite{user.favorites.length !== 1 ? 's' : ''}
+                                    <span>⭐️</span>
+                                    {isLoading
+                                        ? 'Loading..'
+                                        : `${favorites.length} favorite${favorites.length !== 1 ? 's' : ''}`
+                                    }
                                 </p>
                             </Link>
                         </div>

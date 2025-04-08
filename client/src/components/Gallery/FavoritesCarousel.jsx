@@ -3,6 +3,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 import { Navigation, Pagination } from 'swiper/modules';
 import { useEffect, useState } from 'react';
@@ -71,29 +73,38 @@ export default function FavoritesCarousel({ favorites, loading }) {
                 </>
             )}
 
-            {selectedPhoto && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/30 backdrop-blur-md flex items-center justify-center animate-fade"
-                    onClick={() => setSelectedIndex(null)}
-                >
-                    <div
-                        className="relative"
-                        onClick={(e) => e.stopPropagation()}
+            <AnimatePresence>
+                {selectedPhoto && (
+                    <motion.div
+                        className="fixed inset-0 z-50 bg-black/30 backdrop-blur-md flex items-center justify-center"
+                        onClick={() => setSelectedIndex(null)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                     >
-                        <img
-                            src={selectedPhoto.imageUrl}
-                            alt={selectedPhoto.caption}
-                            className="max-w-full max-h-[90vh] object-contain rounded-xl transition-opacity duration-300"
-                        />
-                        <button
-                            className="absolute top-2 right-2 text-white text-3xl font-bold hover:text-gray-300"
-                            onClick={() => setSelectedIndex(null)}
+                        <motion.div
+                            className="relative"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            transition={{ duration: 0.25 }}
                         >
-                            &times;
-                        </button>
-                    </div>
-                </div>
-            )}
+                            <img
+                                src={selectedPhoto.imageUrl}
+                                alt={selectedPhoto.caption}
+                                className="max-w-full max-h-[90vh] object-contain rounded-xl"
+                            />
+                            <button
+                                className="absolute top-2 right-2 text-white text-3xl font-bold hover:text-gray-300"
+                                onClick={() => setSelectedIndex(null)}
+                            >
+                                &times;
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

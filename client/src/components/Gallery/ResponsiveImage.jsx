@@ -11,7 +11,8 @@ export default function ResponsiveImage({
   currentUserId,
   onPhotoUpdate,
   onUserUpdate,
-  favorites }) {
+  favorites,
+  isOwner }) {
 
   const [isVertical, setIsVertical] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -48,7 +49,6 @@ export default function ResponsiveImage({
       const updatedPhoto = response.data;
 
 
-      // Update the parent component’s photo state
       onPhotoUpdate(updatedPhoto);
 
     } catch (error) {
@@ -66,7 +66,7 @@ export default function ResponsiveImage({
 
       const updatedUser = response.data;
 
-      // Update the parent component’s photo state
+   
       onUserUpdate(updatedUser);
 
     } catch (error) {
@@ -97,10 +97,11 @@ export default function ResponsiveImage({
           className="max-h-[600px] h-auto w-auto max-w-full object-contain transition duration-300"
         />
 
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-10 transition duration-300 z-10"></div>
+        
 
-        {currentUserId && (
+        {currentUserId && !isOwner && (
           <>
+          <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-10 transition duration-300 z-10"></div>
             {/* Favorite Icon - Top Right */}
             <button
               onClick={toggleFavorite}

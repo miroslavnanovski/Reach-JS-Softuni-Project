@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { motion,AnimatePresence  } from "framer-motion";
+import { useUser } from "../../contexts/userContext";
 
 export default function EmailInput({ onEmailChange, error }) {
-    const [email, setEmail] = useState('');
-  
+    const { user } = useUser();
+    const [email, setEmail] = useState(user?.email || '');
+  	
+
     const handleChange = (event) => {
       const value = event.target.value;
       setEmail(value);

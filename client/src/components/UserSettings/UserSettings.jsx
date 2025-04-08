@@ -3,8 +3,9 @@ import EmailInput from "./EmailInput";
 import axios from "axios";
 import PasswordInput from "./PasswordInput";
 import { useUser } from "../../contexts/userContext";
-import ConfirmDeleteModal from "../Gallery/ConfirmDeleteModal";
 import { useNavigate } from "react-router-dom";
+import ConfirmDeleteModal from "../Gallery/Modals/ConfirmDeleteModal";
+import { toast } from "react-hot-toast";
 
 export default function UserSettings() {
   const [isChangeOpen, setIsChangeOpen] = useState(false);
@@ -29,7 +30,12 @@ export default function UserSettings() {
     }
   }, [user]);
 
-
+  useEffect(() => {
+    if (isChangeOpen && user?.email) {
+      setEmail(user.email);
+    }
+  }, [isChangeOpen, user]);
+  
 
 
 
@@ -63,7 +69,7 @@ export default function UserSettings() {
   
       const { updatedUser, token: newToken } = response.data;
   
-      // ✅ Update context with new token + user
+      //  Update context with new token + user
       loginUser({
         user: updatedUser,
         token: newToken,
@@ -72,10 +78,15 @@ export default function UserSettings() {
       setEmailDisplay(newEmail);
       setIsChangeOpen(false);
       setError("");
+      toast.success('Email changed successfully!')
   
     } catch (error) {
+
       console.error("API Error:", error);
-      setError("Failed to update email. Please try again.");
+      
+      const message = error?.response?.data?.message || "Failed to update email. Please try again.";
+      setError(message);
+      
     }
   };
 
